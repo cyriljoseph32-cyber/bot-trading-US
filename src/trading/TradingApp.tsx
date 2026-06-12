@@ -18,10 +18,10 @@ const C = {
 };
 
 const ACTION_STYLE: Record<Action, { label: string; fg: string; bg: string; icon: string }> = {
-  ACHETER: { label: "ACHETER", fg: C.green, bg: C.greenBg, icon: "🟢" },
-  VENDRE: { label: "SORTIR", fg: C.red, bg: C.redBg, icon: "🔴" },
-  CONSERVER: { label: "CONSERVER", fg: C.amber, bg: C.amberBg, icon: "🟡" },
-  ATTENDRE: { label: "ATTENDRE", fg: C.textDim, bg: C.panelSoft, icon: "⚪" },
+  ACHETER: { label: "BUY", fg: C.green, bg: C.greenBg, icon: "🟢" },
+  VENDRE: { label: "EXIT", fg: C.red, bg: C.redBg, icon: "🔴" },
+  CONSERVER: { label: "HOLD", fg: C.amber, bg: C.amberBg, icon: "🟡" },
+  ATTENDRE: { label: "WAIT", fg: C.textDim, bg: C.panelSoft, icon: "⚪" },
 };
 
 const ACTION_ORDER: Record<Action, number> = {
@@ -34,7 +34,7 @@ interface Row {
 }
 
 const fmt$ = (v: number) =>
-  v.toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  v.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const fmtPct = (v: number, signed = true) =>
   `${signed && v > 0 ? "+" : ""}${v.toFixed(2)} %`;
 
@@ -65,9 +65,9 @@ export default function TradingApp() {
           const candles = await fetchCandles(symbol);
           const result = runStrategy(candles);
           if (result) nextRows.push({ symbol, result });
-          else nextErrors.push(`${symbol} : historique insuffisant`);
+          else nextErrors.push(`${symbol}: insufficient history`);
         } catch (e) {
-          nextErrors.push(e instanceof Error ? e.message : `Erreur ${symbol}`);
+          nextErrors.push(e instanceof Error ? e.message : `Error ${symbol}`);
         }
       })
     );
@@ -106,9 +106,9 @@ export default function TradingApp() {
         {/* ── En-tête ── */}
         <header style={{ position: "sticky", top: 0, zIndex: 10, display: "flex", flexWrap: "wrap", alignItems: "center", gap: 16, padding: "18px 16px", margin: "0 -16px 20px", background: "rgba(11,18,32,0.72)", backdropFilter: "blur(12px)", borderBottom: `1px solid ${C.border}` }}>
           <div style={{ flex: "1 1 320px" }}>
-            <h1 style={{ margin: 0, fontSize: "clamp(22px, 3.2vw, 32px)", fontWeight: 800, background: `linear-gradient(90deg, ${C.text}, ${C.blue})`, WebkitBackgroundClip: "text", backgroundClip: "text", WebkitTextFillColor: "transparent", letterSpacing: -0.5 }}>📈 Signal Bot — Actifs US</h1>
+            <h1 style={{ margin: 0, fontSize: "clamp(22px, 3.2vw, 32px)", fontWeight: 800, background: `linear-gradient(90deg, ${C.text}, ${C.blue})`, WebkitBackgroundClip: "text", backgroundClip: "text", WebkitTextFillColor: "transparent", letterSpacing: -0.5 }}>📈 Signal Bot — US Assets</h1>
             <div style={{ color: C.textMid, fontSize: 13, marginTop: 4 }}>
-              Stratégie retour à la moyenne RSI(2) · bougies journalières · long uniquement
+              RSI(2) mean-reversion strategy · daily candles · long only
             </div>
           </div>
           <div style={{ display: "flex", gap: 10, alignItems: "flex-end", flexWrap: "wrap" }}>
@@ -121,7 +121,7 @@ export default function TradingApp() {
               />
             </label>
             <label style={{ fontSize: 12, color: C.textMid }}>
-              Risque / trade
+              Risk / trade
               <select
                 value={riskPct} onChange={(e) => setRiskPct(Number(e.target.value))}
                 style={{ display: "block", marginTop: 4, padding: "8px 10px", background: C.panelSoft, color: C.text, border: `1px solid ${C.border}`, borderRadius: 8, fontSize: 14 }}
@@ -133,14 +133,14 @@ export default function TradingApp() {
               onClick={refresh} disabled={loading}
               style={{ padding: "9px 18px", background: loading ? C.panelSoft : C.blue, color: loading ? C.textDim : "#fff", border: "none", borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: loading ? "wait" : "pointer" }}
             >
-              {loading ? "Chargement…" : "🔄 Actualiser"}
+              {loading ? "Loading…" : "🔄 Refresh"}
             </button>
           </div>
         </header>
 
         {updatedAt && (
           <div style={{ fontSize: 12, color: C.textDim, marginBottom: 12 }}>
-            Dernière mise à jour : {updatedAt.toLocaleTimeString("fr-FR")} · actualisation auto toutes les 5 min · données Yahoo Finance (clôtures journalières, différé possible)
+            Last update: {updatedAt.toLocaleTimeString("en-US")} · auto-refresh every 5 min · Yahoo Finance data (daily closes, may be delayed)
           </div>
         )}
 
@@ -148,10 +148,10 @@ export default function TradingApp() {
         {rows.length > 0 && (
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 12, marginBottom: 18 }}>
             {[
-              { l: "Actifs suivis", v: String(rows.length), c: C.text },
-              { l: "Tendance haussière", v: `${bullish}/${rows.length}`, c: bullish >= rows.length / 2 ? C.green : C.amber },
-              { l: "Signaux d'achat", v: String(buys), c: C.green },
-              { l: "Signaux de sortie", v: String(sells), c: C.red },
+              { l: "Assets tracked", v: String(rows.length), c: C.text },
+              { l: "Bullish trend", v: `${bullish}/${rows.length}`, c: bullish >= rows.length / 2 ? C.green : C.amber },
+              { l: "Buy signals", v: String(buys), c: C.green },
+              { l: "Exit signals", v: String(sells), c: C.red },
             ].map((k) => (
               <div key={k.l} style={{ background: "linear-gradient(160deg, #16233B, #111B2E)", border: `1px solid ${C.border}`, borderRadius: 14, padding: "14px 16px" }}>
                 <div style={{ fontSize: 12, color: C.textDim }}>{k.l}</div>
@@ -163,12 +163,12 @@ export default function TradingApp() {
 
         {/* ── Avertissement ── */}
         <div style={{ background: C.amberBg, border: `1px solid ${C.amber}40`, borderRadius: 10, padding: "10px 14px", fontSize: 13, color: C.textMid, marginBottom: 20 }}>
-          ⚠️ <strong style={{ color: C.amber }}>Outil d'aide à la décision, pas un conseil financier.</strong>{" "}
-          La colonne « Réussite hist. » mesure le taux réel de trades gagnants de cette stratégie sur les 2 dernières années — viser ~70 % est l'objectif de la méthode, mais les performances passées ne garantissent rien. Ne risquez que de l'argent que vous pouvez perdre.
+          ⚠️ <strong style={{ color: C.amber }}>Decision-support tool, not financial advice.</strong>{" "}
+          The "Hist. win rate" column shows this strategy's actual share of winning trades over the past 2 years — ~70% is the method's target, but past performance guarantees nothing. Only risk money you can afford to lose.
         </div>
 
         {/* ── Lecture du marché ── */}
-        <h2 style={{ fontSize: 17, margin: "0 0 10px" }}>🌎 Lecture du marché US</h2>
+        <h2 style={{ fontSize: 17, margin: "0 0 10px" }}>🌎 US market overview</h2>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 12, marginBottom: 8 }}>
           {indexRows.map(({ symbol, result }) => {
             const dayPct = result.prevClose ? (result.lastClose / result.prevClose - 1) * 100 : 0;
@@ -180,36 +180,36 @@ export default function TradingApp() {
                   <span style={{ fontSize: 12, color: C.textDim }}>{NAMES[symbol]}</span>
                 </div>
                 <div style={{ fontSize: 22, fontWeight: 700, margin: "6px 0 2px" }}>{fmt$(result.lastClose)} $</div>
-                <div style={{ fontSize: 13, color: dayPct >= 0 ? C.green : C.red }}>{fmtPct(dayPct)} aujourd'hui</div>
+                <div style={{ fontSize: 13, color: dayPct >= 0 ? C.green : C.red }}>{fmtPct(dayPct)} today</div>
                 <div style={{ fontSize: 12, color: C.textMid, marginTop: 8 }}>
-                  Tendance :{" "}
+                  Trend:{" "}
                   <span style={{ color: up ? C.green : C.red, fontWeight: 600 }}>
-                    {up ? "▲ haussière" : "▼ baissière"}
+                    {up ? "▲ bullish" : "▼ bearish"}
                   </span>{" "}
-                  (vs MM200) · RSI14 {result.rsi14?.toFixed(0) ?? "–"}
+                  (vs MA200) · RSI14 {result.rsi14?.toFixed(0) ?? "–"}
                 </div>
               </div>
             );
           })}
           {!indexRows.length && !loading && (
-            <div style={{ color: C.textDim, fontSize: 13 }}>Aucune donnée indice disponible.</div>
+            <div style={{ color: C.textDim, fontSize: 13 }}>No index data available.</div>
           )}
         </div>
         {rows.length > 0 && (
           <div style={{ fontSize: 13, color: C.textMid, margin: "4px 0 24px" }}>
-            {bullish}/{rows.length} actifs en tendance haussière ·{" "}
-            <span style={{ color: C.green }}>{buys} signal{buys > 1 ? "s" : ""} d'achat</span> ·{" "}
-            <span style={{ color: C.red }}>{sells} signal{sells > 1 ? "s" : ""} de sortie</span>
+            {bullish}/{rows.length} assets in an uptrend ·{" "}
+            <span style={{ color: C.green }}>{buys} buy signal{buys > 1 ? "s" : ""}</span> ·{" "}
+            <span style={{ color: C.red }}>{sells} exit signal{sells > 1 ? "s" : ""}</span>
           </div>
         )}
 
         {/* ── Tableau des signaux ── */}
-        <h2 style={{ fontSize: 17, margin: "0 0 10px" }}>🎯 Signaux du jour & plan d'action</h2>
+        <h2 style={{ fontSize: 17, margin: "0 0 10px" }}>🎯 Today's signals & action plan</h2>
         <div style={{ overflowX: "auto", background: C.panel, border: `1px solid ${C.border}`, borderRadius: 12 }}>
           <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, minWidth: 880 }}>
             <thead>
               <tr style={{ color: C.textDim, textAlign: "left" }}>
-                {["Actif", "Cours", "Var. jour", "RSI(2)", "Tendance", "Signal", "Plan d'action", "Réussite hist."].map((h) => (
+                {["Asset", "Price", "Day chg.", "RSI(2)", "Trend", "Signal", "Action plan", "Hist. win rate"].map((h) => (
                   <th key={h} style={{ padding: "12px 14px", borderBottom: `1px solid ${C.border}`, fontWeight: 600, whiteSpace: "nowrap" }}>{h}</th>
                 ))}
               </tr>
@@ -221,31 +221,31 @@ export default function TradingApp() {
                 const wr = r.winRate;
                 const wrColor = wr === null ? C.textDim : wr >= 0.7 ? C.green : wr >= 0.6 ? C.amber : C.red;
 
-                let plan: React.ReactNode = <span style={{ color: C.textDim }}>Aucune action — attendre un repli en tendance haussière.</span>;
+                let plan: React.ReactNode = <span style={{ color: C.textDim }}>No action — wait for a pullback within an uptrend.</span>;
                 if (r.action === "ACHETER" && r.entryPlan) {
                   const qty = positionSize(capital, riskPct, r.entryPlan.entry, r.entryPlan.stop);
                   plan = (
                     <span>
-                      Acheter <strong>{qty || "—"}</strong> action{qty > 1 ? "s" : ""} ≈ <strong>{fmt$(r.entryPlan.entry)} $</strong>
+                      Buy <strong>{qty || "—"}</strong> share{qty > 1 ? "s" : ""} ≈ <strong>{fmt$(r.entryPlan.entry)} $</strong>
                       <br />
-                      Stop : <strong style={{ color: C.red }}>{fmt$(r.entryPlan.stop)} $</strong> · Sortie : clôture &gt; MM5 (ou 10 séances max)
+                      Stop: <strong style={{ color: C.red }}>{fmt$(r.entryPlan.stop)} $</strong> · Exit: close &gt; MA5 (or 10 days max)
                     </span>
                   );
                 } else if (r.action === "VENDRE") {
                   plan = (
                     <span>
-                      Clôturer la position au cours actuel —{" "}
-                      {r.exitReason === "stop" ? "stop touché 🔻" : r.exitReason === "temps" ? "délai de 10 séances atteint" : "objectif atteint (clôture > MM5) ✅"}
+                      Close the position at the current price —{" "}
+                      {r.exitReason === "stop" ? "stop hit 🔻" : r.exitReason === "temps" ? "10-day time limit reached" : "target reached (close > MA5) ✅"}
                     </span>
                   );
                 } else if (r.action === "CONSERVER" && r.open) {
                   const pnl = (r.lastClose / r.open.entryPrice - 1) * 100;
                   plan = (
                     <span>
-                      En position depuis {r.open.daysHeld} séance{r.open.daysHeld > 1 ? "s" : ""} (entrée {fmt$(r.open.entryPrice)} $,{" "}
+                      In position for {r.open.daysHeld} day{r.open.daysHeld > 1 ? "s" : ""} (entry {fmt$(r.open.entryPrice)} $,{" "}
                       <span style={{ color: pnl >= 0 ? C.green : C.red }}>{fmtPct(pnl)}</span>)
                       <br />
-                      Garder le stop à <strong style={{ color: C.red }}>{fmt$(r.open.stop)} $</strong> · sortir si clôture &gt; MM5
+                      Keep the stop at <strong style={{ color: C.red }}>{fmt$(r.open.stop)} $</strong> · exit if close &gt; MA5
                     </span>
                   );
                 }
@@ -262,7 +262,7 @@ export default function TradingApp() {
                       {r.rsi2?.toFixed(0) ?? "–"}
                     </td>
                     <td style={{ padding: "12px 14px", color: r.trend === "haussier" ? C.green : C.red, whiteSpace: "nowrap" }}>
-                      {r.trend === "haussier" ? "▲ haussière" : "▼ baissière"}
+                      {r.trend === "haussier" ? "▲ bullish" : "▼ bearish"}
                     </td>
                     <td style={{ padding: "12px 14px" }}>
                       <span style={{ background: a.bg, color: a.fg, padding: "4px 10px", borderRadius: 999, fontWeight: 700, fontSize: 12, whiteSpace: "nowrap" }}>
@@ -273,7 +273,7 @@ export default function TradingApp() {
                     <td style={{ padding: "12px 14px", whiteSpace: "nowrap" }}>
                       <strong style={{ color: wrColor }}>{wr === null ? "–" : `${(wr * 100).toFixed(0)} %`}</strong>
                       <div style={{ fontSize: 11, color: C.textDim }}>
-                        {r.trades.length} trades / 2 ans · {fmtPct(r.totalPnlPct)} cumulés
+                        {r.trades.length} trades / 2y · {fmtPct(r.totalPnlPct)} cumulative
                       </div>
                     </td>
                   </tr>
@@ -282,7 +282,7 @@ export default function TradingApp() {
               {!rows.length && (
                 <tr>
                   <td colSpan={8} style={{ padding: 24, textAlign: "center", color: C.textDim }}>
-                    {loading ? "Analyse du marché en cours…" : "Aucune donnée. Cliquez sur Actualiser."}
+                    {loading ? "Analyzing the market…" : "No data. Click Refresh."}
                   </td>
                 </tr>
               )}
@@ -292,7 +292,7 @@ export default function TradingApp() {
 
         {errors.length > 0 && (
           <div style={{ marginTop: 12, fontSize: 12, color: C.red }}>
-            Erreurs : {errors.join(" · ")}
+            Errors: {errors.join(" · ")}
           </div>
         )}
 
@@ -301,14 +301,14 @@ export default function TradingApp() {
 
         {/* ── Méthode ── */}
         <div style={{ marginTop: 28, background: C.panel, border: `1px solid ${C.border}`, borderRadius: 12, padding: 18, fontSize: 13, color: C.textMid, lineHeight: 1.7 }}>
-          <h3 style={{ margin: "0 0 8px", color: C.text, fontSize: 15 }}>📚 Comment fonctionne le bot</h3>
-          <strong style={{ color: C.text }}>Entrée (🟢 ACHETER)</strong> : l'actif est en tendance haussière de fond (cours &gt; moyenne mobile 200 jours) <em>et</em> vient de subir un repli excessif à court terme (RSI 2 jours &lt; 10). Statistiquement, ces replis en tendance haussière rebondissent dans la majorité des cas — c'est ce qui permet de viser ~70 % de trades gagnants.
+          <h3 style={{ margin: "0 0 8px", color: C.text, fontSize: 15 }}>📚 How the bot works</h3>
+          <strong style={{ color: C.text }}>Entry (🟢 BUY)</strong> : the asset is in a long-term uptrend (price &gt; 200-day moving average) <em>and</em> has just had an excessive short-term pullback (2-day RSI &lt; 10). Statistically, such pullbacks within an uptrend bounce back in most cases — that is what makes the ~70% win-rate target possible.
           <br />
-          <strong style={{ color: C.text }}>Sortie (🔴 SORTIR)</strong> : dès que la clôture repasse au-dessus de la moyenne mobile 5 jours (prise de profit), si le stop de protection est touché (entrée − 2,5 × ATR14), ou après 10 séances sans rebond.
+          <strong style={{ color: C.text }}>Exit (🔴 EXIT)</strong> : as soon as the close moves back above the 5-day moving average (profit taking), if the protective stop is hit (entry − 2.5 × ATR14), or after 10 days without a bounce.
           <br />
-          <strong style={{ color: C.text }}>Gestion du risque</strong> : la taille de position est calculée pour que le stop ne coûte que {riskPct} % de votre capital ({fmt$((capital * riskPct) / 100)} $ par trade). C'est ce qui protège le compte : les gains sont fréquents et petits, les pertes rares sont coupées.
+          <strong style={{ color: C.text }}>Risk management</strong> : the position size is calculated so that the stop only costs {riskPct}% of your capital ({fmt$((capital * riskPct) / 100)} $ per trade). That is what protects the account: gains are frequent and small, the rare losses are cut short.
           <br />
-          <strong style={{ color: C.text }}>Discipline</strong> : prenez TOUS les signaux ou aucun — le taux de réussite n'a de sens que sur un grand nombre de trades. Vérifiez les signaux après la clôture de Wall Street (22h00, heure de Paris).
+          <strong style={{ color: C.text }}>Discipline</strong> : take ALL the signals or none — the win rate is only meaningful over a large number of trades. Check the signals after the Wall Street close (4:00 PM New York time).
         </div>
       </div>
     </div>
