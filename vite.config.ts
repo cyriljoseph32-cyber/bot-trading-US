@@ -9,7 +9,8 @@ export default defineConfig({
   plugins: [react()],
   build: {
     rollupOptions: {
-      // Deux pages : la landing (index.html) et le bot trading (trading.html)
+      // index.html et trading.html servent tous deux le dashboard du bot
+      // (trading.html conservé pour ne pas casser l'URL /trading.html existante).
       input: {
         main: page('./index.html'),
         trading: page('./trading.html'),
