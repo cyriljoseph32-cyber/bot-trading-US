@@ -38,6 +38,7 @@ async function alpaca<T>(path: string, init?: RequestInit): Promise<T> {
 
 export interface AlpacaAccount {
   equity: string;
+  last_equity: string; // equity à la clôture précédente → base du P&L du jour
   cash: string;
   buying_power: string;
   status: string;
@@ -89,10 +90,91 @@ export function submitBuyWithStop(symbol: string, qty: number, stop: number) {
   });
 }
 
+/** Achat à cours LIMITÉ + stop de protection attaché (OTO) — fix #1.
+ *  Le limit plafonne le prix payé : en cas de gap d'ouverture au-delà du
+ *  plafond, l'ordre n'est pas exécuté plutôt que de surpayer. */
+export function submitLimitBuyWithStop(symbol: string, qty: number, limit: number, stop: number) {
+  return alpaca<AlpacaOrder>("/v2/orders", {
+    method: "POST",
+    body: JSON.stringify({
+      symbol,
+      qty: String(qty),
+      side: "buy",
+      type: "limit",
+      limit_price: limit.toFixed(2),
+      time_in_force: "day",
+      order_class: "oto",
+      stop_loss: { stop_price: stop.toFixed(2) },
+    }),
+  });
+}
+
 /** Liquide la position (et annule les ordres stop associés). */
 export function closePosition(symbol: string) {
   return alpaca<AlpacaOrder>(
     `/v2/positions/${encodeURIComponent(symbol)}?cancel_orders=true`,
     { method: "DELETE" }
   );
+}
+
+/* ─── Exécution pro (Phase 1) ──────────────────────────────────────────────
+ * Méthodes disponibles pour les futures stratégies. La stratégie RSI-2 actuelle
+ * continue d'utiliser submitBuyWithStop (market + stop) car elle sort sur signal
+ * (clôture > MM5), pas sur un take-profit fixe.
+ */
+
+/** Achat bracket (OCO) : entrée au marché + stop de protection + take-profit. */
+export function submitBracketBuy(
+  symbol: string,
+  qty: number,
+  stop: number,
+  takeProfit: number
+) {
+  return alpaca<AlpacaOrder>("/v2/orders", {
+    method: "POST",
+    body: JSON.stringify({
+      symbol,
+      qty: String(qty),
+      side: "buy",
+      type: "market",
+      time_in_force: "day",
+      order_class: "bracket",
+      stop_loss: { stop_price: stop.toFixed(2) },
+      take_profit: { limit_price: takeProfit.toFixed(2) },
+    }),
+  });
+}
+
+/** Ordre d'achat à cours limité (ne s'exécute qu'au prix voulu ou mieux). */
+export function submitLimitBuy(symbol: string, qty: number, limit: number) {
+  return alpaca<AlpacaOrder>("/v2/orders", {
+    method: "POST",
+    body: JSON.stringify({
+      symbol,
+      qty: String(qty),
+      side: "buy",
+      type: "limit",
+      limit_price: limit.toFixed(2),
+      time_in_force: "day",
+    }),
+  });
+}
+
+/** Stop suiveur sur une position détenue (protège les gains en tendance). */
+export function submitTrailingStopSell(
+  symbol: string,
+  qty: number,
+  trailPercent: number
+) {
+  return alpaca<AlpacaOrder>("/v2/orders", {
+    method: "POST",
+    body: JSON.stringify({
+      symbol,
+      qty: String(qty),
+      side: "sell",
+      type: "trailing_stop",
+      trail_percent: String(trailPercent),
+      time_in_force: "gtc",
+    }),
+  });
 }

@@ -40,7 +40,7 @@ export async function fetchCandles(symbol: string): Promise<Candle[]> {
   const res = await fetch(
     `/api/market?symbol=${encodeURIComponent(symbol)}&range=2y`
   );
-  if (!res.ok) throw new Error(`HTTP ${res.status} for ${symbol}`);
+  if (!res.ok) throw new Error(`HTTP ${res.status} pour ${symbol}`);
   const data: YahooChart = await res.json();
 
   const result = data.chart?.result?.[0];
@@ -48,7 +48,7 @@ export async function fetchCandles(symbol: string): Promise<Candle[]> {
   const quote = result?.indicators?.quote?.[0];
   if (!ts || !quote?.close) {
     throw new Error(
-      data.chart?.error?.description ?? `Data unavailable for ${symbol}`
+      data.chart?.error?.description ?? `Données indisponibles pour ${symbol}`
     );
   }
 

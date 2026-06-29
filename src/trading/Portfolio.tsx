@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
+import { authedFetch, setToken } from "./auth";
 
 /* ─── Suivi du compte courtier (Alpaca) via /api/positions ───────────────── */
 
@@ -14,6 +15,7 @@ interface PortfolioData {
   live: boolean;
   autotrade: boolean;
   emailConfigured: boolean;
+  authProtected?: boolean;
   error?: string;
   account?: { equity: number; cash: number; buyingPower: number; status: string };
   positions?: Array<{
@@ -27,7 +29,7 @@ interface PortfolioData {
 }
 
 const fmt$ = (v: number) =>
-  v.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  v.toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
 const badge = (label: string, fg: string, bg: string) => (
   <span style={{ background: bg, color: fg, padding: "3px 10px", borderRadius: 999, fontWeight: 700, fontSize: 11, whiteSpace: "nowrap" }}>
@@ -39,20 +41,39 @@ export default function Portfolio() {
   const [data, setData] = useState<PortfolioData | null>(null);
   const [unavailable, setUnavailable] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [needAuth, setNeedAuth] = useState(false);
+  const [tokenInput, setTokenInput] = useState("");
 
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/positions");
+      const res = await authedFetch("/api/positions");
+      if (res.status === 401) {
+        setNeedAuth(true);
+        setUnavailable(false);
+        setLoading(false);
+        return;
+      }
       const ct = res.headers.get("content-type") ?? "";
-      if (!ct.includes("application/json")) throw new Error("API unavailable");
+      if (!ct.includes("application/json")) throw new Error("API absente");
       setData(await res.json());
+      setNeedAuth(false);
       setUnavailable(false);
     } catch {
       setUnavailable(true); // dev local sans fonctions Vercel, ou réseau coupé
     }
     setLoading(false);
   }, []);
+
+  const submitToken = useCallback(
+    (e: React.FormEvent) => {
+      e.preventDefault();
+      setToken(tokenInput);
+      setTokenInput("");
+      load();
+    },
+    [tokenInput, load]
+  );
 
   useEffect(() => {
     const first = setTimeout(load, 0);
@@ -69,62 +90,88 @@ export default function Portfolio() {
   return (
     <section style={{ marginTop: 28 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 10 }}>
-        <h2 style={{ fontSize: 17, margin: 0 }}>📒 Position tracking (broker)</h2>
+        <h2 style={{ fontSize: 17, margin: 0 }}>📒 Suivi des positions (courtier)</h2>
         {data?.configured && (
           <>
             {data.live
-              ? badge("LIVE MONEY", C.red, C.redBg)
-              : badge("PAPER — simulated", C.green, C.greenBg)}
+              ? badge("ARGENT RÉEL", C.red, C.redBg)
+              : badge("PAPER — fictif", C.green, C.greenBg)}
             {data.autotrade
-              ? badge("🤖 Auto-trading ON", C.amber, C.amberBg)
-              : badge("Auto-trading OFF", C.textDim, C.panelSoft)}
+              ? badge("🤖 Trading auto ON", C.amber, C.amberBg)
+              : badge("Trading auto OFF", C.textDim, C.panelSoft)}
             {data.emailConfigured
-              ? badge("✉️ Email alerts ON", C.blue, C.panelSoft)
-              : badge("✉️ Email not configured", C.textDim, C.panelSoft)}
+              ? badge("✉️ Alertes email ON", C.blue, C.panelSoft)
+              : badge("✉️ Email non configuré", C.textDim, C.panelSoft)}
           </>
         )}
         <button
           onClick={load} disabled={loading}
           style={{ marginLeft: "auto", padding: "6px 14px", background: C.panelSoft, color: C.textMid, border: `1px solid ${C.border}`, borderRadius: 8, fontSize: 12, cursor: loading ? "wait" : "pointer" }}
         >
-          {loading ? "…" : "Refresh"}
+          {loading ? "…" : "Rafraîchir"}
         </button>
       </div>
 
+      {needAuth && (
+        <form onSubmit={submitToken} style={{ background: C.panel, border: `1px solid ${C.amber}55`, borderRadius: 12, padding: 16, fontSize: 13, color: C.textMid, lineHeight: 1.6 }}>
+          <strong style={{ color: C.text }}>🔒 Dashboard protégé</strong>
+          <div style={{ margin: "6px 0 10px" }}>
+            Entrez le token (variable <code>DASHBOARD_TOKEN</code>) pour afficher le compte.
+          </div>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            <input
+              type="password" value={tokenInput} onChange={(e) => setTokenInput(e.target.value)}
+              placeholder="token…" autoComplete="off"
+              style={{ flex: 1, minWidth: 200, padding: "8px 12px", background: C.panelSoft, color: C.text, border: `1px solid ${C.border}`, borderRadius: 8, fontSize: 13 }}
+            />
+            <button type="submit" style={{ padding: "8px 18px", background: C.blue, color: "#04101F", border: "none", borderRadius: 8, fontWeight: 700, fontSize: 13, cursor: "pointer" }}>
+              Déverrouiller
+            </button>
+          </div>
+        </form>
+      )}
+
+      {data?.configured && data.authProtected === false && (
+        <div style={{ background: C.amberBg, border: `1px solid ${C.amber}40`, borderRadius: 12, padding: "10px 14px", fontSize: 12.5, color: C.amber, marginBottom: 12, lineHeight: 1.6 }}>
+          ⚠️ Dashboard non protégé : n'importe qui connaissant l'URL voit votre compte.
+          Définissez <code>DASHBOARD_TOKEN</code> dans Vercel pour le verrouiller.
+        </div>
+      )}
+
       {unavailable && (
         <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 12, padding: 16, fontSize: 13, color: C.textMid, lineHeight: 1.6 }}>
-          Broker tracking is only available once the app is deployed on Vercel (<code>/api</code>).
-          Locally, only the signals work.
+          Le suivi courtier n'est disponible qu'une fois l'app déployée sur Vercel (fonctions <code>/api</code>).
+          En local, seuls les signaux fonctionnent.
         </div>
       )}
 
       {data && !data.configured && (
         <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 12, padding: 16, fontSize: 13, color: C.textMid, lineHeight: 1.7 }}>
-          <strong style={{ color: C.text }}>Connect an Alpaca account for live tracking and automated trading.</strong>
+          <strong style={{ color: C.text }}>Connectez un compte Alpaca pour le suivi réel et le trading automatique.</strong>
           <br />
-          1. Create a free account at <span style={{ color: C.blue }}>alpaca.markets</span> and copy your <em>paper trading</em> API keys.
+          1. Créez un compte gratuit sur <span style={{ color: C.blue }}>alpaca.markets</span> et copiez vos clés API <em>paper trading</em>.
           <br />
-          2. In Vercel → Settings → Environment Variables, add <code>ALPACA_KEY_ID</code> et <code>ALPACA_SECRET_KEY</code>.
+          2. Dans Vercel → Settings → Environment Variables, ajoutez <code>ALPACA_KEY_ID</code> et <code>ALPACA_SECRET_KEY</code>.
           <br />
-          3. For automatic signal execution, add <code>AUTOTRADE=true</code>. The bot stays on simulated money as long as <code>ALPACA_LIVE=true</code> is not set.
+          3. Pour l'exécution automatique des signaux, ajoutez <code>AUTOTRADE=true</code>. Le bot reste en argent fictif tant que <code>ALPACA_LIVE=true</code> n'est pas défini.
           <br />
-          4. For email alerts: <code>RESEND_API_KEY</code> (resend.com key) + <code>ALERT_EMAIL</code> (your address).
+          4. Pour les alertes email : <code>RESEND_API_KEY</code> (clé resend.com) + <code>ALERT_EMAIL</code> (votre adresse).
         </div>
       )}
 
       {data?.error && (
         <div style={{ background: C.redBg, border: `1px solid ${C.red}40`, borderRadius: 12, padding: 14, fontSize: 13, color: C.red, marginBottom: 12 }}>
-          Broker error: {data.error}
+          Erreur courtier : {data.error}
         </div>
       )}
 
       {data?.account && (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 12, marginBottom: 12 }}>
           {[
-            ["Account value", `${fmt$(data.account.equity)} $`],
-            ["Cash", `${fmt$(data.account.cash)} $`],
-            ["Buying power", `${fmt$(data.account.buyingPower)} $`],
-            ["Open positions", String(data.positions?.length ?? 0)],
+            ["Valeur du compte", `${fmt$(data.account.equity)} $`],
+            ["Liquidités", `${fmt$(data.account.cash)} $`],
+            ["Pouvoir d'achat", `${fmt$(data.account.buyingPower)} $`],
+            ["Positions ouvertes", String(data.positions?.length ?? 0)],
           ].map(([label, value]) => (
             <div key={label} style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 12, padding: 14 }}>
               <div style={{ fontSize: 12, color: C.textDim }}>{label}</div>
@@ -139,7 +186,7 @@ export default function Portfolio() {
           <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, minWidth: 600 }}>
             <thead>
               <tr style={{ color: C.textDim }}>
-                {["Asset", "Quantity", "Entry price", "Current price", "Value", "Unrealized P&L"].map((h) => (
+                {["Actif", "Quantité", "Prix d'entrée", "Cours actuel", "Valeur", "P&L latent"].map((h) => (
                   <th key={h} style={cellH}>{h}</th>
                 ))}
               </tr>
@@ -164,22 +211,22 @@ export default function Portfolio() {
 
       {data?.configured && data.positions?.length === 0 && !data.error && (
         <div style={{ fontSize: 13, color: C.textDim, marginBottom: 12 }}>
-          No open positions at the broker right now.
+          Aucune position ouverte chez le courtier pour le moment.
         </div>
       )}
 
       {data?.orders && data.orders.length > 0 && (
         <details style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 12, padding: "10px 14px", fontSize: 13, color: C.textMid }}>
           <summary style={{ cursor: "pointer", fontWeight: 600, color: C.text }}>
-            Recent orders ({data.orders.length})
+            Derniers ordres ({data.orders.length})
           </summary>
           <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12, marginTop: 8 }}>
             <tbody>
               {data.orders.map((o, i) => (
                 <tr key={i}>
-                  <td style={cell}>{new Date(o.submittedAt).toLocaleDateString("en-US")}</td>
+                  <td style={cell}>{new Date(o.submittedAt).toLocaleDateString("fr-FR")}</td>
                   <td style={{ ...cell, color: o.side === "buy" ? C.green : C.red, fontWeight: 600 }}>
-                    {o.side === "buy" ? "BUY" : "SELL"}
+                    {o.side === "buy" ? "ACHAT" : "VENTE"}
                   </td>
                   <td style={{ ...cell, fontWeight: 600 }}>{o.symbol}</td>
                   <td style={cell}>{o.qty} × {o.fillPrice ? `${fmt$(o.fillPrice)} $` : "—"}</td>

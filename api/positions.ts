@@ -7,9 +7,12 @@ import {
   getPositions,
   isLive,
 } from "./_lib/alpaca";
+import { checkDashboardAuth, unauthorizedResponse } from "./_lib/auth";
+import { integrationStatus } from "./_lib/env";
 
 /* ─── Suivi du compte courtier pour le dashboard ──────────────────────────
  * GET /api/positions → état du compte Alpaca (positions, ordres récents).
+ * Protégé par DASHBOARD_TOKEN dès qu'il est défini (cf. _lib/auth.ts).
  */
 
 export default async function handler(req: Request) {
@@ -17,11 +20,17 @@ export default async function handler(req: Request) {
     return new Response("Method not allowed", { status: 405 });
   }
 
+  // Sécurité : données de compte sensibles → exige le token si configuré.
+  const auth = checkDashboardAuth(req, { failClosed: true });
+  if (!auth.ok) return unauthorizedResponse(auth.reason!);
+
+  const status = integrationStatus();
   const base = {
     configured: alpacaConfigured(),
     live: isLive(),
-    autotrade: process.env.AUTOTRADE === "true",
-    emailConfigured: Boolean(process.env.RESEND_API_KEY && process.env.ALERT_EMAIL),
+    autotrade: status.autotrade,
+    emailConfigured: status.email,
+    authProtected: status.authProtected,
   };
 
   if (!base.configured) {

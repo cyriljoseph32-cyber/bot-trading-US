@@ -57,9 +57,9 @@ Vercel redéploie automatiquement.
 
 ---
 
-## Reste de la feuille de route
-- **Phase 2** — Données intraday (Alpaca IEX) + multi-timeframe.
-- **Phase 3** — Scanner multi-actifs (worker + file) + détecteurs (cassure, momentum, volume…).
-- **Phase 4** — Scoring 0–100 (technique + tendance + volume + sentiment news) .
-- **Phase 5** — Dashboard pro (win rate, profit factor, drawdown, Sharpe, courbe d'equity) + assistant conversationnel.
-- **Phase 6** — Backtesting v2 (frais, slippage, walk-forward) ; crypto/forex en option.
+## Phases 2-6 — cerveau analytique (livré, testé, déployé)
+
+**48 tests Vitest verts.** Code pur, déployé en production le 29 juin 2026.
+
+- **Phase 2 (socle)** — `volume` ajouté aux bougies et aux récupérations (Yahoo) côté serveur et client. *Reste : fournisseur intraday Alpaca IEX + multi-timeframe (1m…1H) — infra à venir.*
+- **Phase 3** — `src/trading/detectors.ts` : détecteurs tendance, cassure, momentum, volatilité, volume, retournement (5 tests). *Reste : exécuter 

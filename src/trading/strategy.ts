@@ -31,6 +31,7 @@ export interface Candle {
   high: number;
   low: number;
   close: number;
+  volume?: number; // optionnel : utilisé par les détecteurs de volume
 }
 
 export type ExitReason = "objectif" | "stop" | "temps";
@@ -65,6 +66,8 @@ export interface StrategyResult {
   rsi2: number | null;
   rsi14: number | null;
   sma200: number | null;
+  sma5: number | null;   // MM5 (règle de sortie) — exposée pour la réconciliation
+  lastTime: number;      // date (epoch s) de la dernière bougie — fraîcheur des données
 }
 
 export function runStrategy(candles: Candle[]): StrategyResult | null {
@@ -171,6 +174,8 @@ export function runStrategy(candles: Candle[]): StrategyResult | null {
     rsi2: rsi2[last],
     rsi14: rsi14[last],
     sma200: smaTrend[last],
+    sma5: smaExit[last],
+    lastTime: candles[last].time,
   };
 }
 
@@ -184,4 +189,25 @@ export function positionSize(
   const riskPerShare = entry - stop;
   if (riskPerShare <= 0 || capital <= 0) return 0;
   return Math.floor((capital * riskPct) / 100 / riskPerShare);
+}
+
+/* ─── Décision de SORTIE sur une position RÉELLE (fix #2) ───────────────────
+ * Pure et testable. Source de vérité = la position réellement détenue, pas la
+ * simulation. Le stop est géré en intra-day par le courtier ; ici on couvre
+ * la prise de profit (clôture > MM5) et la sortie temps. */
+export interface ExitDecision { exit: boolean; reason: ExitReason | null; }
+
+export function evaluateExit(
+  candles: Candle[],
+  pos: { entryPrice: number; stop: number; daysHeld: number }
+): ExitDecision {
+  if (candles.length < PARAMS.smaExit + 1) return { exit: false, reason: null };
+  const closes = candles.map((c) => c.close);
+  const last = closes.length - 1;
+  const close = closes[last];
+  const sma5 = sma(closes, PARAMS.smaExit)[last];
+  if (close <= pos.stop) return { exit: true, reason: "stop" };
+  if (sma5 != null && close > sma5) return { exit: true, reason: "objectif" };
+  if (pos.daysHeld >= PARAMS.maxHoldDays) return { exit: true, reason: "temps" };
+  return { exit: false, reason: null };
 }
