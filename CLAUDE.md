@@ -55,6 +55,5 @@ Database schema lives in `supabase/migrations/0001_init.sql` (tables `runs`, `si
 
 ## Gotchas
 
-- **Stray root-level duplicates**: `alpaca.ts`, `auth.ts`, `auth (1).ts`, `db.ts`, `engine.ts`, `env.ts`, `market.ts`, `risk.ts`, `strategy.ts`, `indicators.ts`, `*.test.ts`, `Portfolio.tsx`, `TradingApp.tsx`, `0001_init.sql`, `env.example`, `download` at the repo root are **outdated copies uploaded via the GitHub web UI** (some even have mismatched contents, e.g. root `strategy.ts` contains test code). The canonical sources are `src/trading/`, `api/`, `supabase/migrations/`, and `.env.example`. Never edit the root copies.
-- Because `eslint .` also parses those stray files, **`npm run lint` currently fails** with parsing errors in root `indicators.ts`/`market.ts`. Tests and build are unaffected (`vitest.config.ts` includes only `src/**/*.test.ts`; `tsconfig.app.json` includes only `src`).
+- The repo previously had stray root-level duplicates of `src/trading/` and `api/` files (leftovers from bulk GitHub-web-UI uploads, some even mislabeled — e.g. root `env.example` contained `Portfolio.tsx`'s React code). These were removed; the canonical sources are `src/trading/`, `api/`, `supabase/migrations/`, and `.env.example`. If similar stray files reappear at the repo root after a future upload, delete them rather than editing them.
 - `DEPLOIEMENT.md` is the changelog + deployment runbook, but the repo state can lag behind it (files arrive as bulk uploads) — trust the code over the doc when they disagree.
