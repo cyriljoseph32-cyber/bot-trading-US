@@ -2,6 +2,10 @@
 
 Bot de signaux de trading sur les actifs américains (S&P 500, Nasdaq, grandes capitalisations), accessible sur **`/trading.html`**.
 
+> 🌍 **Nouveau — bot global multi-actifs temps réel** (actions mondiales + FX,
+> flux WebSocket Twelve Data, moteur de risque, paper trading par défaut) :
+> voir **[bot/README.md](bot/README.md)**. Démarrage : `npm run bot:paper`.
+
 ## Ce que fait le bot
 
 - **Lecture du marché US** : tendance (vs MM200) et momentum (RSI) sur SPY, QQQ, DIA, IWM + 16 grandes valeurs US, données Yahoo Finance rafraîchies toutes les 5 minutes.
