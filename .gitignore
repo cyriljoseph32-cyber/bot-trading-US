@@ -12,6 +12,9 @@ dist
 dist-ssr
 *.local
 
+# Persistance locale du bot (bougies/signaux/ordres JSONL)
+data/
+
 # Secrets — ne jamais commiter
 .env
 .env.*

@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bot Global — Dashboard</title>
+<style>
+  :root { --bg:#0b1220; --card:#131c2e; --text:#d7dce6; --dim:#8a93a6; --up:#4ade80; --down:#f87171; --accent:#60a5fa; --border:#233046; }
+  * { box-sizing:border-box; margin:0; }
+  body { background:var(--bg); color:var(--text); font:14px/1.45 system-ui,-apple-system,sans-serif; padding:12px; }
+  h1 { font-size:18px; margin-bottom:10px; }
+  h2 { font-size:13px; color:var(--dim); text-transform:uppercase; letter-spacing:.06em; margin-bottom:6px; }
+  .grid { display:grid; gap:12px; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); }
+  .card { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:12px; overflow-x:auto; }
+  table { width:100%; border-collapse:collapse; font-size:13px; }
+  th, td { text-align:left; padding:4px 8px 4px 0; white-space:nowrap; }
+  th { color:var(--dim); font-weight:500; }
+  .up { color:var(--up); } .down { color:var(--down); } .dim { color:var(--dim); }
+  .pill { display:inline-block; padding:1px 8px; border-radius:99px; font-size:12px; border:1px solid var(--border); }
+  .pill.ok { color:var(--up); border-color:var(--up); }
+  .pill.bad { color:var(--down); border-color:var(--down); }
+  .kpis { display:flex; flex-wrap:wrap; gap:14px; }
+  .kpi b { display:block; font-size:17px; }
+  .kpi span { color:var(--dim); font-size:12px; }
+  button { background:var(--card); color:var(--down); border:1px solid var(--down); border-radius:8px; padding:6px 12px; cursor:pointer; font-size:13px; }
+  button.safe { color:var(--accent); border-color:var(--accent); }
+  #logs { font-family:ui-monospace,monospace; font-size:11.5px; max-height:220px; overflow-y:auto; }
+</style>
+</head>
+<body>
+<h1>🌍 Bot Global Multi-Actifs <span id="feed" class="pill">…</span> <span id="mode" class="pill ok">PAPER</span></h1>
+
+<div class="grid">
+  <div class="card">
+    <h2>P&amp;L (papier)</h2>
+    <div class="kpis" id="pnl"></div>
+  </div>
+  <div class="card">
+    <h2>Risque</h2>
+    <div class="kpis" id="risk"></div>
+    <p style="margin-top:8px">
+      <button id="killBtn">Kill switch</button>
+      <button id="circuitBtn" class="safe">Réarmer disjoncteur</button>
+    </p>
+  </div>
+</div>
+
+<div class="grid" style="margin-top:12px">
+  <div class="card" style="grid-column:1/-1">
+    <h2>Signaux classés</h2>
+    <table id="signals"><thead><tr><th>Symbole</th><th>TF</th><th>Sens</th><th>Score</th><th>Confiance</th><th>Prix</th><th>Raisons</th></tr></thead><tbody></tbody></table>
+  </div>
+  <div class="card">
+    <h2>Positions ouvertes</h2>
+    <table id="positions"><thead><tr><th>Symbole</th><th>Qté</th><th>Entrée</th><th>Stop</th><th>TP</th></tr></thead><tbody></tbody></table>
+  </div>
+  <div class="card">
+    <h2>Marchés / watchlist</h2>
+    <table id="markets"><thead><tr><th>Symbole</th><th>Exchange</th><th>Session</th><th>Dernier tick</th></tr></thead><tbody></tbody></table>
+  </div>
+  <div class="card" style="grid-column:1/-1">
+    <h2>Journal</h2>
+    <div id="logs"></div>
+  </div>
+</div>
+
+<script>
+const $ = (s) => document.querySelector(s);
+const fmt = (n) => typeof n === "number" ? n.toLocaleString("fr-FR", {maximumFractionDigits:2}) : "—";
+
+async function get(path) { const r = await fetch(path); return r.json(); }
+
+let killOn = false;
+async function refresh() {
+  try {
+    const [health, pnl, risk, signals, positions, status, logs] = await Promise.all([
+      get("/api/health"), get("/api/pnl"), get("/api/risk"), get("/api/signals"),
+      get("/api/positions"), get("/api/status"), get("/api/logs"),
+    ]);
+
+    const feed = $("#feed");
+    feed.textContent = health.feed;
+    feed.className = "pill " + (health.feed === "connected" ? "ok" : "bad");
+
+    $("#pnl").innerHTML = ["equity","cash","dayPnl","realizedPnl","unrealizedPnl"].map((k) => {
+      const v = pnl[k];
+      const cls = k === "equity" || k === "cash" ? "" : v >= 0 ? "up" : "down";
+      return `<div class="kpi"><b class="${cls}">${fmt(v)} ${pnl.baseCurrency}</b><span>${k}</span></div>`;
+    }).join("");
+
+    killOn = risk.params.killSwitch;
+    $("#risk").innerHTML =
+      `<div class="kpi"><b class="${risk.params.killSwitch ? "down":"up"}">${risk.params.killSwitch ? "ON":"off"}</b><span>kill switch</span></div>` +
+      `<div class="kpi"><b class="${risk.circuitOpen ? "down":"up"}">${risk.circuitOpen ? "OUVERT":"fermé"}</b><span>disjoncteur</span></div>` +
+      `<div class="kpi"><b>${fmt(risk.dailyLossPct)}%</b><span>perte du jour (max ${risk.params.maxDailyLossPct}%)</span></div>` +
+      `<div class="kpi"><b>${risk.params.maxPositionPct}%</b><span>position max</span></div>` +
+      `<div class="kpi"><b>${risk.params.maxGrossExposurePct}%</b><span>exposition max</span></div>`;
+    $("#killBtn").textContent = killOn ? "Désactiver kill switch" : "Kill switch";
+
+    $("#signals tbody").innerHTML = signals.slice(0, 25).map((s) =>
+      `<tr><td>${s.symbol}</td><td>${s.tf}</td><td class="${s.side==="long"?"up":s.side==="short"?"down":"dim"}">${s.side}</td>` +
+      `<td><b>${s.score}</b></td><td>${s.confidence}</td><td>${fmt(s.price)}</td><td class="dim">${s.reasons.join(", ")}</td></tr>`
+    ).join("") || `<tr><td colspan="7" class="dim">aucun signal (amorçage des données…)</td></tr>`;
+
+    $("#positions tbody").innerHTML = positions.map((p) =>
+      `<tr><td>${p.symbol}</td><td class="${p.qty>0?"up":"down"}">${p.qty}</td><td>${fmt(p.avgEntryPrice)}</td>` +
+      `<td>${fmt(p.stopLoss)}</td><td>${fmt(p.takeProfit)}</td></tr>`
+    ).join("") || `<tr><td colspan="5" class="dim">aucune position</td></tr>`;
+
+    $("#markets tbody").innerHTML = status.markets.map((m) => {
+      const age = health.quotesAgeMs[m.symbol];
+      const ageTxt = age === undefined ? "—" : age > 120000 ? `${Math.round(age/60000)} min ⚠` : `${Math.round(age/1000)}s`;
+      return `<tr><td>${m.symbol}</td><td class="dim">${m.exchange}</td>` +
+        `<td class="${m.open?"up":"dim"}">${m.open?"ouvert":"fermé"}</td><td>${ageTxt}</td></tr>`;
+    }).join("");
+
+    $("#logs").innerHTML = logs.slice().reverse().map((l) =>
+      `<div class="${l.level==="error"?"down":l.level==="warn"?"":"dim"}">${l.ts.slice(11,19)} [${l.scope}] ${l.msg}</div>`
+    ).join("");
+  } catch { $("#feed").textContent = "hors ligne"; $("#feed").className = "pill bad"; }
+}
+
+$("#killBtn").onclick = async () => {
+  if (!killOn && !confirm("Activer le kill switch ? Plus aucune nouvelle entrée.")) return;
+  await fetch("/api/risk/kill", { method:"POST", headers:{"content-type":"application/json"}, body: JSON.stringify({ on: !killOn }) });
+  refresh();
+};
+$("#circuitBtn").onclick = async () => { await fetch("/api/risk/reset-circuit", { method:"POST" }); refresh(); };
+
+refresh();
+setInterval(refresh, 5000);
+</script>
+</body>
+</html>

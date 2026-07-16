@@ -1,0 +1,115 @@
+{
+  "comment": "Univers configurable — AUCUN symbole n'est codé en dur dans le code. Les seeds sont les grandes capitalisations liquides de chaque région ; la sélection finale (topN, liquidité, spread, exclusions) est appliquée par bot/src/universe.ts. UNIVERSE_DYNAMIC=true reclasse par liquidité via l'API du fournisseur.",
+  "selection": {
+    "topNPerRegion": 5,
+    "minAvgDollarVolume": 5000000,
+    "maxSpreadBps": 50,
+    "requireValidData": true,
+    "rebalanceDays": 30
+  },
+  "exclusions": [],
+  "benchmark": { "symbol": "SPY", "assetClass": "equity", "exchange": "NYSE", "currency": "USD", "country": "US", "region": "us" },
+  "equities": {
+    "us": { "exchange": "NASDAQ", "currency": "USD", "country": "US", "seeds": [
+      { "symbol": "AAPL", "name": "Apple", "sector": "tech" },
+      { "symbol": "MSFT", "name": "Microsoft", "sector": "tech" },
+      { "symbol": "NVDA", "name": "Nvidia", "sector": "tech" },
+      { "symbol": "AMZN", "name": "Amazon", "sector": "consumer" },
+      { "symbol": "GOOGL", "name": "Alphabet", "sector": "tech" },
+      { "symbol": "META", "name": "Meta", "sector": "tech" },
+      { "symbol": "JPM", "name": "JPMorgan", "sector": "financials", "exchange": "NYSE" },
+      { "symbol": "XOM", "name": "ExxonMobil", "sector": "energy", "exchange": "NYSE" }
+    ]},
+    "canada": { "exchange": "TSX", "currency": "CAD", "country": "CA", "seeds": [
+      { "symbol": "RY", "name": "Royal Bank of Canada", "sector": "financials" },
+      { "symbol": "SHOP", "name": "Shopify", "sector": "tech" },
+      { "symbol": "ENB", "name": "Enbridge", "sector": "energy" },
+      { "symbol": "CNR", "name": "Canadian National Railway", "sector": "industrials" },
+      { "symbol": "TD", "name": "Toronto-Dominion Bank", "sector": "financials" }
+    ]},
+    "uk": { "exchange": "LSE", "currency": "GBP", "country": "GB", "seeds": [
+      { "symbol": "AZN", "name": "AstraZeneca", "sector": "healthcare" },
+      { "symbol": "SHEL", "name": "Shell", "sector": "energy" },
+      { "symbol": "HSBA", "name": "HSBC", "sector": "financials" },
+      { "symbol": "ULVR", "name": "Unilever", "sector": "consumer" },
+      { "symbol": "RIO", "name": "Rio Tinto", "sector": "materials" }
+    ]},
+    "eurozone": { "exchange": "Euronext", "currency": "EUR", "country": "FR", "seeds": [
+      { "symbol": "MC", "name": "LVMH", "sector": "consumer" },
+      { "symbol": "ASML", "name": "ASML", "sector": "tech", "country": "NL" },
+      { "symbol": "TTE", "name": "TotalEnergies", "sector": "energy" },
+      { "symbol": "SAP", "name": "SAP", "sector": "tech", "exchange": "XETR", "country": "DE" },
+      { "symbol": "SIE", "name": "Siemens", "sector": "industrials", "exchange": "XETR", "country": "DE" }
+    ]},
+    "switzerland": { "exchange": "SIX", "currency": "CHF", "country": "CH", "seeds": [
+      { "symbol": "NESN", "name": "Nestlé", "sector": "consumer" },
+      { "symbol": "ROG", "name": "Roche", "sector": "healthcare" },
+      { "symbol": "NOVN", "name": "Novartis", "sector": "healthcare" },
+      { "symbol": "UBSG", "name": "UBS", "sector": "financials" }
+    ]},
+    "nordics": { "exchange": "OMX", "currency": "SEK", "country": "SE", "seeds": [
+      { "symbol": "NOVO.B", "name": "Novo Nordisk", "sector": "healthcare", "currency": "DKK", "country": "DK" },
+      { "symbol": "ATCO.A", "name": "Atlas Copco", "sector": "industrials" },
+      { "symbol": "VOLV.B", "name": "Volvo", "sector": "industrials" },
+      { "symbol": "EQNR", "name": "Equinor", "sector": "energy", "currency": "NOK", "country": "NO" }
+    ]},
+    "japan": { "exchange": "TSE", "currency": "JPY", "country": "JP", "seeds": [
+      { "symbol": "7203", "name": "Toyota", "sector": "consumer" },
+      { "symbol": "6758", "name": "Sony", "sector": "tech" },
+      { "symbol": "8306", "name": "Mitsubishi UFJ", "sector": "financials" },
+      { "symbol": "6861", "name": "Keyence", "sector": "tech" },
+      { "symbol": "9984", "name": "SoftBank Group", "sector": "tech" }
+    ]},
+    "hongkong_china": { "exchange": "HKEX", "currency": "HKD", "country": "HK", "seeds": [
+      { "symbol": "0700", "name": "Tencent", "sector": "tech", "country": "CN" },
+      { "symbol": "9988", "name": "Alibaba", "sector": "tech", "country": "CN" },
+      { "symbol": "1299", "name": "AIA Group", "sector": "financials" },
+      { "symbol": "3690", "name": "Meituan", "sector": "tech", "country": "CN" }
+    ]},
+    "india": { "exchange": "NSE", "currency": "INR", "country": "IN", "seeds": [
+      { "symbol": "RELIANCE", "name": "Reliance Industries", "sector": "energy" },
+      { "symbol": "TCS", "name": "Tata Consultancy", "sector": "tech" },
+      { "symbol": "HDFCBANK", "name": "HDFC Bank", "sector": "financials" },
+      { "symbol": "INFY", "name": "Infosys", "sector": "tech" }
+    ]},
+    "australia": { "exchange": "ASX", "currency": "AUD", "country": "AU", "seeds": [
+      { "symbol": "BHP", "name": "BHP Group", "sector": "materials" },
+      { "symbol": "CBA", "name": "Commonwealth Bank", "sector": "financials" },
+      { "symbol": "CSL", "name": "CSL", "sector": "healthcare" }
+    ]},
+    "singapore": { "exchange": "SGX", "currency": "SGD", "country": "SG", "seeds": [
+      { "symbol": "D05", "name": "DBS Group", "sector": "financials" },
+      { "symbol": "O39", "name": "OCBC", "sector": "financials" },
+      { "symbol": "Z74", "name": "Singtel", "sector": "telecom" }
+    ]},
+    "southkorea": { "exchange": "KRX", "currency": "KRW", "country": "KR", "seeds": [
+      { "symbol": "005930", "name": "Samsung Electronics", "sector": "tech" },
+      { "symbol": "000660", "name": "SK Hynix", "sector": "tech" },
+      { "symbol": "005380", "name": "Hyundai Motor", "sector": "consumer" }
+    ]},
+    "brazil": { "exchange": "BVMF", "currency": "BRL", "country": "BR", "seeds": [
+      { "symbol": "PETR4", "name": "Petrobras", "sector": "energy" },
+      { "symbol": "VALE3", "name": "Vale", "sector": "materials" },
+      { "symbol": "ITUB4", "name": "Itaú Unibanco", "sector": "financials" }
+    ]},
+    "mexico": { "exchange": "BMV", "currency": "MXN", "country": "MX", "seeds": [
+      { "symbol": "AMXB", "name": "América Móvil", "sector": "telecom" },
+      { "symbol": "WALMEX", "name": "Walmart de México", "sector": "consumer" },
+      { "symbol": "GFNORTEO", "name": "Banorte", "sector": "financials" }
+    ]},
+    "southafrica": { "exchange": "JSE", "currency": "ZAR", "country": "ZA", "seeds": [
+      { "symbol": "NPN", "name": "Naspers", "sector": "tech" },
+      { "symbol": "FSR", "name": "FirstRand", "sector": "financials" },
+      { "symbol": "SOL", "name": "Sasol", "sector": "energy" }
+    ]}
+  },
+  "fx": {
+    "majors": ["EUR/USD", "USD/JPY", "GBP/USD", "USD/CHF", "AUD/USD", "USD/CAD", "NZD/USD"],
+    "crosses": ["EUR/GBP", "EUR/JPY", "GBP/JPY"],
+    "em": ["USD/CNH", "USD/MXN", "USD/BRL", "USD/INR", "USD/ZAR", "USD/SGD"]
+  },
+  "crypto": {
+    "comment": "Le bot d'origine ne gère pas la crypto — liste vide, mais la classe d'actif est supportée : ajouter p.ex. BTC/USD ici pour l'activer.",
+    "pairs": []
+  }
+}
