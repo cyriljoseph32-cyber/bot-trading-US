@@ -31,6 +31,19 @@ TypeScript, déployé sur Vercel. Deux moteurs :
 - `api/market.ts` = proxy Yahoo Finance en production ; en dev local, le proxy Vite
   (`vite.config.ts`) fait le même travail.
 
+## L'équipe d'agents
+
+| Agent | Rôle | Raccourci |
+|---|---|---|
+| `trading-ops` (`.claude/agents/trading-ops.md`) | Exploitation : signaux, positions paper, santé du cron/emails, audit sécurité & config | `/trading` |
+| `quant` (`.claude/agents/quant.md`) | Stratégie RSI-2, backtests, propositions d'évolution chiffrées | `/backtest` |
+| `dev-trading` (`.claude/agents/dev-trading.md`) | Code : dashboard, API Vercel, bot temps réel — typecheck + lint + tests avant push | `/bot-dev` |
+
+Règles communes : français avec Cyril ; **jamais de conseil en investissement ni de promesse
+de performance** ; **jamais `ALPACA_LIVE` ni `AUTOTRADE`** sans décision explicite de Cyril ;
+zéro invention (`[À COMPLÉTER PAR CYRIL]`) ; chaque agent lit la fiche mémoire du projet
+avant d'agir et met à jour la mémoire centrale après une session significative.
+
 ## Mémoire centrale
 
 La mémoire transverse des projets de Cyril vit dans le dépôt
