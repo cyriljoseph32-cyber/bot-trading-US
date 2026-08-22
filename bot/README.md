@@ -173,11 +173,21 @@ taille réduite** (`correlationOverrideScoreDelta` / `…SizeMult`).
 métaux, énergie, agricoles, grandes capitalisations, ETF, crypto). Chaque entrée
 porte `std` (symbole standard) **et** `provider` (symbole attendu par l'API).
 
-> ⚠ **Aucun ticker n'est supposé exister chez votre courtier.** Les actifs dont
-> la disponibilité n'est pas certaine sont livrés `enabled: false` avec une note
-> `[À VÉRIFIER CHEZ LE COURTIER]` — 77 des 100 sont actifs par défaut. Vérifiez
-> chez votre courtier avant d'en activer d'autres ; `/api/spcfx5/universe`
-> montre à tout moment qui est suivi et qui est écarté, avec la raison.
+**33 des 100 sont actifs par défaut** — une sélection diversifiée (7 paires FX
+majeures, 3 indices US, or et argent, BTC et ETH, 19 grandes valeurs
+multi-sectorielles) calibrée pour tenir sous le plafond gratuit Twelve Data.
+Les 67 autres sont `enabled: false` pour deux raisons distinctes, toujours
+écrites dans leur note :
+
+- **`[DÉSACTIVÉ — budget crédits]`** — l'actif est bon, il ne rentre juste pas
+  dans le budget. Repasser `enabled` à `true` suffit dès que le plafond monte.
+- **`[À VÉRIFIER CHEZ LE COURTIER]`** — le ticker lui-même n'est pas confirmé
+  (indices européens/asiatiques, matières premières, actions hors marchés US,
+  cryptos secondaires). À vérifier chez votre courtier **avant** activation.
+
+> ⚠ **Aucun ticker n'est supposé exister chez votre courtier.**
+> `/api/spcfx5/universe` montre à tout moment qui est suivi et qui est écarté,
+> avec la raison.
 
 ### Cadence et crédits API
 
@@ -186,9 +196,19 @@ WebSocket, limité à 8 symboles en offre gratuite). H4 et D1 sont **agrégés
 localement** depuis les bougies H1 closes : aucun crédit supplémentaire, et
 aucun lookahead possible.
 
-> ⚠ 100 actifs = ~100 crédits REST/heure (**~2 400/jour**). L'offre gratuite
-> Twelve Data plafonne à 800/jour : baissez `SPC_MAX_SYMBOLS` ou prenez un plan
-> payant. Le bot affiche son budget estimé au démarrage.
+Le budget se calcule simplement : **1 actif scanné en H1 = 24 crédits REST/jour**
+(une requête par heure).
+
+| Actifs scannés | Crédits/jour | Compatible offre gratuite (800/jour) |
+|---|---|---|
+| **33** (défaut livré) | 792 | ✅ tout juste |
+| 50 | 1 200 | ❌ plan payant |
+| 100 | 2 400 | ❌ plan payant |
+
+> ⚠ Pour monter au-delà de 33, il faut **deux** gestes : relever
+> `SPC_MAX_SYMBOLS` **et** repasser à `enabled: true` les actifs voulus dans
+> `spcfx5.json` — le plafond seul ne réactive rien. Le bot affiche son budget
+> estimé au démarrage.
 
 ### API
 
@@ -206,7 +226,7 @@ aucun lookahead possible.
 | Variable | Défaut | Rôle |
 |---|---|---|
 | `SPC_CONFIG` | `bot/config/spcfx5.json` | Watchlist et paramètres. |
-| `SPC_MAX_SYMBOLS` | `100` | Plafond d'actifs scannés (budget de crédits). |
+| `SPC_MAX_SYMBOLS` | `100` (code) · **33** conseillé | Plafond d'actifs scannés — 33 pour tenir dans l'offre gratuite. |
 | `SPC_NEWS_FILE` | — | Annonces macro (`bot/config/news.example.json`). Absent = filtre neutre. |
 | `SPC_SESSION_FILTER` | actif | `false` désactive le filtre de session (backtest). |
 | `SPC_WEBHOOK_URL` | — | Publication des signaux retenus. |

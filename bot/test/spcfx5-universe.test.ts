@@ -57,7 +57,10 @@ describe("configuration livrée (bot/config/spcfx5.json)", () => {
 
   it("se charge en un univers exploitable", () => {
     const { selected, skipped } = selectSpcUniverse(config, 100);
-    expect(selected.length).toBeGreaterThan(50);
+    // Curé le 22/08/2026 à 33 actifs "enabled:true" (FX majeures, indices US,
+    // métaux, crypto, actions multi-secteurs) pour tenir sous le plafond
+    // gratuit Twelve Data (800 crédits REST/jour ÷ 24 crédits/actif/jour = 33).
+    expect(selected.length).toBe(33);
     expect(selected.length + skipped.length).toBe(100);
     expect(skipped.every((s) => s.reason === "disabled")).toBe(true);
   });
