@@ -28,7 +28,11 @@ export class BarAggregator {
   /** Dernier tick vu par symbole (déduplication). */
   private lastTick = new Map<string, { ts: number; price: number }>();
 
-  constructor(private readonly onClose: (event: BarCloseEvent) => void) {}
+  constructor(
+    private readonly onClose: (event: BarCloseEvent) => void,
+    /** Timeframes agrégés à partir des ticks (défaut : 1m/5m/15m). */
+    private readonly timeframes: Timeframe[] = TIMEFRAMES
+  ) {}
 
   private key(symbol: string, tf: Timeframe): string {
     return `${symbol}|${tf}`;
@@ -54,7 +58,7 @@ export class BarAggregator {
     if (prev && prev.ts === quote.ts && prev.price === quote.last) return;
     this.lastTick.set(quote.symbol, { ts: quote.ts, price: quote.last });
 
-    for (const tf of TIMEFRAMES) {
+    for (const tf of this.timeframes) {
       this.ingest(quote, tf, assetClass);
     }
   }
@@ -127,6 +131,61 @@ export class BarAggregator {
     const hist = this.history.get(this.key(symbol, tf)) ?? [];
     return includeOutliers ? [...hist] : hist.filter((b) => !b.outlier);
   }
+}
+
+/**
+ * Agrège des bougies d'un timeframe source vers un timeframe supérieur
+ * (H1 → H4/D1). Pur, sans état.
+ *
+ * ANTI-LOOKAHEAD — règle centrale : une bougie du timeframe supérieur n'est
+ * émise que si sa période est ENTIÈREMENT terminée au regard de la dernière
+ * bougie source close. Une bougie H4 en cours de formation n'apparaît donc
+ * jamais dans le résultat et ne peut pas influencer un signal H1.
+ *
+ * Les périodes sont alignées sur l'epoch UTC (D1 = minuit UTC). Pour les
+ * actions, une bougie « D1 » ne couvre que les heures de séance disponibles —
+ * c'est la même information qu'un chart intraday agrégé, pas la bougie
+ * officielle de l'exchange.
+ */
+export function aggregateHigherTf(bars: Bar[], target: Timeframe): Bar[] {
+  if (bars.length === 0) return [];
+  const targetMs = TF_MS[target];
+  const sourceMs = TF_MS[bars[0].tf];
+  if (targetMs <= sourceMs) return [];
+
+  const sorted = [...bars].sort((a, b) => a.openTime - b.openTime);
+  // Fin de la dernière période source close : borne anti-lookahead.
+  const lastSourceClose = sorted[sorted.length - 1].openTime + sourceMs;
+
+  const buckets = new Map<number, Bar>();
+  for (const bar of sorted) {
+    if (bar.outlier) continue;
+    const openTime = Math.floor(bar.openTime / targetMs) * targetMs;
+    const current = buckets.get(openTime);
+    if (!current) {
+      buckets.set(openTime, {
+        symbol: bar.symbol,
+        tf: target,
+        openTime,
+        open: bar.open,
+        high: bar.high,
+        low: bar.low,
+        close: bar.close,
+        volume: bar.volume,
+        ticks: bar.ticks,
+      });
+      continue;
+    }
+    current.high = Math.max(current.high, bar.high);
+    current.low = Math.min(current.low, bar.low);
+    current.close = bar.close;
+    current.volume += bar.volume;
+    current.ticks += bar.ticks;
+  }
+
+  return [...buckets.values()]
+    .filter((b) => b.openTime + targetMs <= lastSourceClose)
+    .sort((a, b) => a.openTime - b.openTime);
 }
 
 function newBar(quote: Quote, tf: Timeframe, openTime: number, gapBefore: boolean): Bar {

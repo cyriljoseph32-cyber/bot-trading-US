@@ -15,16 +15,20 @@ export interface Store {
   saveBar(bar: Bar): void;
   saveSignal(signal: ScoredSignal): void;
   saveOrder(order: OrderResult): void;
+  /** Enregistrement libre, typé par `kind` (stratégies additionnelles : SPC FX5…). */
+  saveRecord(kind: string, record: unknown): void;
 }
 
 export class MemoryStore implements Store {
   bars: Bar[] = [];
   signals: ScoredSignal[] = [];
   orders: OrderResult[] = [];
+  records: Array<{ kind: string; record: unknown }> = [];
 
   saveBar(bar: Bar): void { this.bars.push(bar); }
   saveSignal(signal: ScoredSignal): void { this.signals.push(signal); }
   saveOrder(order: OrderResult): void { this.orders.push(order); }
+  saveRecord(kind: string, record: unknown): void { this.records.push({ kind, record }); }
 }
 
 export class JsonlStore implements Store {
@@ -40,4 +44,5 @@ export class JsonlStore implements Store {
   saveBar(bar: Bar): void { this.append("bars", bar); }
   saveSignal(signal: ScoredSignal): void { this.append("signals", signal); }
   saveOrder(order: OrderResult): void { this.append("orders", order); }
+  saveRecord(kind: string, record: unknown): void { this.append(kind, record); }
 }

@@ -53,6 +53,21 @@ export interface BotEnv {
   dataDir: string;
   /** Arrêt d'urgence au démarrage (modifiable ensuite via l'API). */
   killSwitch: boolean;
+
+  /* ─── SPC FX5 Multi-Asset 100 ──────────────────────────────────────── */
+  /** Chemin de la configuration d'univers SPC FX5. */
+  spcConfigPath: string | undefined;
+  /**
+   * Plafond de symboles scannés. 100 actifs en H1 ≈ 100 crédits REST/heure
+   * (~2 400/jour) : l'offre gratuite Twelve Data (800/jour) ne suffit pas.
+   */
+  spcMaxSymbols: number;
+  /** Fichier JSON des annonces macro à fort impact (optionnel). */
+  spcNewsFile: string | undefined;
+  /** false = filtre de session désactivé (backtest). */
+  spcSessionFilter: boolean;
+  /** URL de webhook pour publier les signaux retenus (optionnel). */
+  spcWebhookUrl: string | undefined;
 }
 
 export function loadEnv(): BotEnv {
@@ -67,5 +82,12 @@ export function loadEnv(): BotEnv {
     paperCapital: num("PAPER_CAPITAL", 100_000, { min: 100 }),
     dataDir: str("BOT_DATA_DIR") ?? "data",
     killSwitch: flag("KILL_SWITCH"),
+
+    spcConfigPath: str("SPC_CONFIG"),
+    spcMaxSymbols: num("SPC_MAX_SYMBOLS", 100, { min: 1, max: 500 }),
+    spcNewsFile: str("SPC_NEWS_FILE"),
+    // Actif par défaut ; SPC_SESSION_FILTER=false le désactive (backtest).
+    spcSessionFilter: process.env.SPC_SESSION_FILTER !== "false",
+    spcWebhookUrl: str("SPC_WEBHOOK_URL"),
   };
 }

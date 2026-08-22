@@ -2,9 +2,16 @@
 
 Bot de signaux de trading sur les actifs américains (S&P 500, Nasdaq, grandes capitalisations), accessible sur **`/trading.html`**.
 
-> 🌍 **Nouveau — bot global multi-actifs temps réel** (actions mondiales + FX,
-> flux WebSocket Twelve Data, moteur de risque, paper trading par défaut) :
+> 🌍 **Bot global multi-actifs temps réel** (actions mondiales + FX, flux
+> WebSocket Twelve Data, moteur de risque, paper trading par défaut) :
 > voir **[bot/README.md](bot/README.md)**. Démarrage : `npm run bot:paper`.
+>
+> 🎯 **Nouveau — SPC FX5 Multi-Asset 100** : stratégie H1 trend-following
+> (SMA 200 + ADX/DI + UT Bot) qui scanne jusqu'à 100 actifs, classe les setups
+> par score de qualité /100, plafonne l'exposition aux actifs corrélés et
+> arbitre un budget de risque portefeuille. Paper trading uniquement.
+> Démarrage : `npm run bot:spcfx5` — détails dans
+> **[bot/README.md](bot/README.md#spc-fx5-multi-asset-100-stratégie-h1-trend-following)**.
 
 ## Ce que fait le bot
 

@@ -85,6 +85,21 @@ export interface EntryContext {
   portfolio: PortfolioSnapshot;
   /** Conversion devise de cotation → devise de base (1 unité → base). */
   fxToBase: (currency: string, amount: number) => number | null;
+  /**
+   * Stop imposé par la stratégie (prix absolu). Quand il est fourni, il
+   * remplace le stop ATR par défaut — SPC FX5 combine volatilité et niveau
+   * technique, ce calcul appartient à la stratégie, pas au moteur de risque.
+   * Le moteur reste maître du sizing et de tous les plafonds.
+   */
+  stopLossOverride?: number;
+  /** Take-profit imposé par la stratégie (prix absolu). */
+  takeProfitOverride?: number;
+  /**
+   * Multiplicateur du risque nominal, entre 0 et 1 (exception de corrélation :
+   * on entre plus petit). Jamais > 1 : aucune règle ne peut AUGMENTER le
+   * risque par trade.
+   */
+  riskMultiplier?: number;
 }
 
 /** Exposition en devise de base d'un ensemble de positions filtrées. */
@@ -157,20 +172,32 @@ export class RiskEngine {
       if (bps > p.maxSpreadBps) rejects.push("spread_too_wide");
     }
 
-    // Stop par volatilité : impossible de dimensionner sans ATR valide.
+    // Stop : celui de la stratégie s'il est fourni, sinon distance ATR.
     const price = quote.last;
     const atrValue = ctx.atr;
-    if (atrValue === null || !(atrValue > 0) || !(price > 0)) {
+    let stopDistance: number;
+    if (ctx.stopLossOverride !== undefined) {
+      stopDistance =
+        ctx.side === "buy" ? price - ctx.stopLossOverride : ctx.stopLossOverride - price;
+    } else if (atrValue !== null && atrValue > 0) {
+      stopDistance = atrValue * p.atrStopMult;
+    } else {
       rejects.push("stop_invalid");
       return { approved: false, qty: 0, rejects };
     }
-    const stopDistance = atrValue * p.atrStopMult;
-    const stopLoss = ctx.side === "buy" ? price - stopDistance : price + stopDistance;
+    if (!(stopDistance > 0) || !(price > 0)) {
+      rejects.push("stop_invalid");
+      return { approved: false, qty: 0, rejects };
+    }
+    const stopLoss =
+      ctx.stopLossOverride ??
+      (ctx.side === "buy" ? price - stopDistance : price + stopDistance);
     const takeProfit =
-      ctx.side === "buy"
+      ctx.takeProfitOverride ??
+      (ctx.side === "buy"
         ? price + stopDistance * p.takeProfitR
-        : price - stopDistance * p.takeProfitR;
-    if (stopLoss <= 0) {
+        : price - stopDistance * p.takeProfitR);
+    if (stopLoss <= 0 || takeProfit <= 0) {
       rejects.push("stop_invalid");
       return { approved: false, qty: 0, rejects };
     }
@@ -178,8 +205,10 @@ export class RiskEngine {
     if (rejects.length > 0) return { approved: false, qty: 0, rejects };
 
     // Sizing par volatilité : risque fixe en % de l'equity entre entrée et stop.
+    // Le multiplicateur ne peut que RÉDUIRE le risque (borné à [0 ; 1]).
     const equity = portfolio.equity;
-    const riskBudgetBase = equity * (p.riskPctPerTrade / 100);
+    const riskMultiplier = Math.max(0, Math.min(1, ctx.riskMultiplier ?? 1));
+    const riskBudgetBase = equity * (p.riskPctPerTrade / 100) * riskMultiplier;
     const stopDistanceBase = ctx.fxToBase(instrument.currency, stopDistance);
     const priceBase = ctx.fxToBase(instrument.currency, price);
     if (stopDistanceBase === null || priceBase === null || stopDistanceBase <= 0) {

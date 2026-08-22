@@ -10,6 +10,10 @@ TypeScript, déployé sur Vercel. Deux moteurs :
    `ALPACA_LIVE=true` ; ne jamais l'activer sans décision explicite de Cyril.
 2. **Bot global multi-actifs temps réel** (`bot/`, flux WebSocket Twelve Data) :
    `npm run bot:paper` — voir `bot/README.md`.
+3. **SPC FX5 Multi-Asset 100** (`bot/src/strategy/spcfx5/`, `bot/src/spcfx5.ts`) :
+   stratégie H1 trend-following (SMA 200 + ADX/DI + UT Bot) sur jusqu'à 100 actifs,
+   scoring /100, groupes de corrélation, risque portefeuille — `npm run bot:spcfx5`.
+   Watchlist : `bot/config/spcfx5.json`. **Paper uniquement.**
 
 ## Commandes
 
@@ -17,6 +21,7 @@ TypeScript, déployé sur Vercel. Deux moteurs :
 - `npm run build` — `tsc -b && vite build`
 - `npm run typecheck` · `npm run lint` · `npm run test:run` (Vitest)
 - `npm run bot:paper` · `npm run bot:backtest` — bot global (tsx)
+- `npm run bot:spcfx5` · `npm run bot:spcfx5-backtest` — SPC FX5 Multi-Asset 100
 
 ## Règles
 

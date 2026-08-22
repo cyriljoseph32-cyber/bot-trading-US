@@ -1,0 +1,30 @@
+{
+  "comment": "Format attendu par SPC_NEWS_FILE — annonces macro à fort impact. Le fichier est OPTIONNEL : sans lui, le filtre news reste neutre et le signale (note 'news_feed_absent'), la stratégie fonctionne normalement. 'ts' est en millisecondes epoch UTC. Un événement sans 'currencies' ni 'symbols' est considéré comme mondial et bloque tous les actifs. Seul impact 'high' bloque les nouvelles entrées ; aucune position ouverte n'est jamais fermée par ce filtre (sauf params.news.closePositionsOnNews = true, désactivé par défaut).",
+  "events": [
+    {
+      "ts": 1755864000000,
+      "impact": "high",
+      "currencies": ["USD"],
+      "title": "FOMC — décision de taux"
+    },
+    {
+      "ts": 1755950400000,
+      "impact": "high",
+      "currencies": ["EUR"],
+      "title": "BCE — décision de taux"
+    },
+    {
+      "ts": 1756036800000,
+      "impact": "high",
+      "currencies": ["USD"],
+      "symbols": [],
+      "title": "NFP — emplois non agricoles"
+    },
+    {
+      "ts": 1756123200000,
+      "impact": "medium",
+      "currencies": ["GBP"],
+      "title": "PIB Royaume-Uni (impact moyen — ne bloque pas)"
+    }
+  ]
+}

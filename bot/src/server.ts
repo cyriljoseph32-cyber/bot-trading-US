@@ -23,6 +23,16 @@ export interface BotState {
   risk: RiskEngine;
   quotesAgeMs: () => Record<string, number>;
   startedAt: number;
+  /** Présent uniquement quand le processus fait tourner SPC FX5. */
+  spcfx5?: SpcFx5State;
+}
+
+/** Vues exposées par la stratégie SPC FX5 (données déjà calculées). */
+export interface SpcFx5State {
+  signals: () => unknown[];
+  ranked: () => unknown[];
+  universe: () => unknown;
+  governor: () => unknown;
 }
 
 function json(res: ServerResponse, status: number, body: unknown): void {
@@ -114,6 +124,29 @@ export function startServer(state: BotState, port: number, bind = "127.0.0.1"): 
         }
         case "/api/logs": {
           json(res, 200, logger.recent(150));
+          return;
+        }
+        case "/api/spcfx5/signals": {
+          if (!state.spcfx5) return json(res, 404, { error: "spcfx5_not_running" });
+          // Classement complet : score, détail par composant, rejets, rang.
+          json(res, 200, state.spcfx5.ranked());
+          return;
+        }
+        case "/api/spcfx5/rejects": {
+          if (!state.spcfx5) return json(res, 404, { error: "spcfx5_not_running" });
+          // Tous les setups NON retenus, avec la raison exacte.
+          const signals = state.spcfx5.signals() as Array<{ eligible?: boolean }>;
+          json(res, 200, signals.filter((s) => s.eligible !== true));
+          return;
+        }
+        case "/api/spcfx5/universe": {
+          if (!state.spcfx5) return json(res, 404, { error: "spcfx5_not_running" });
+          json(res, 200, state.spcfx5.universe());
+          return;
+        }
+        case "/api/spcfx5/portfolio": {
+          if (!state.spcfx5) return json(res, 404, { error: "spcfx5_not_running" });
+          json(res, 200, state.spcfx5.governor());
           return;
         }
       }
