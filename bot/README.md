@@ -100,6 +100,7 @@ briques (provider, bougies, sessions, risque, paper broker, backtest).
 npm run bot:spcfx5              # scan H1 + paper trading (dashboard :8787)
 npm run bot:spcfx5-backtest     # échantillon synthétique déterministe
 npm run bot:spcfx5-backtest -- data/bars-2026-08-22.jsonl   # ou vos bougies H1
+npm run bot:spcfx5-check        # vérifie les tickers "À VÉRIFIER" via l'API (nécessite TWELVEDATA_API_KEY)
 ```
 
 ### Philosophie
@@ -184,6 +185,10 @@ Les 67 autres sont `enabled: false` pour deux raisons distinctes, toujours
 - **`[À VÉRIFIER CHEZ LE COURTIER]`** — le ticker lui-même n'est pas confirmé
   (indices européens/asiatiques, matières premières, actions hors marchés US,
   cryptos secondaires). À vérifier chez votre courtier **avant** activation.
+  `npm run bot:spcfx5-check` interroge `/symbol_search` pour chacun de ces
+  actifs (1 crédit/appel, une seule fois) et affiche existe / n'existe pas /
+  autre symbole trouvé — sans jamais modifier `spcfx5.json` : c'est à vous de
+  décider quoi activer une fois l'information en main.
 
 > ⚠ **Aucun ticker n'est supposé exister chez votre courtier.**
 > `/api/spcfx5/universe` montre à tout moment qui est suivi et qui est écarté,
