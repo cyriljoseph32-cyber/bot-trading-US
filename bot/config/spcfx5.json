@@ -1,0 +1,1716 @@
+{
+  "comment": "SPC FX5 Multi-Asset 100 — watchlist modulaire. AUCUN symbole n'est codé en dur dans le code : tout se règle ici. Chaque actif porte 'std' (symbole standard) et 'provider' (symbole attendu par l'API/le courtier). RÈGLE : ne jamais supposer qu'un ticker existe — les actifs dont la disponibilité n'est pas certaine sont livrés enabled:false avec une note [À VÉRIFIER CHEZ LE COURTIER]. 33 actifs sont enabled:true par défaut : c'est le maximum tenable sur l'offre gratuite Twelve Data (1 actif en H1 = 24 crédits REST/jour, plafond 800/jour). Les actifs coupés pour cette seule raison portent la note [DÉSACTIVÉ — budget crédits] et se réactivent en repassant enabled à true, sans autre vérification. Les 'groups' portent le signe du pari : 'usd:-1' = être long cet actif revient à être SHORT le dollar.",
+  "params": {
+    "minScore": 70
+  },
+  "portfolio": {
+    "maxOpenPositions": 8,
+    "maxPositionsPerCategory": 3,
+    "maxTotalOpenRiskPct": 3,
+    "maxDailyRiskPct": 2,
+    "maxDailyLossPct": 2,
+    "maxWeeklyLossPct": 5,
+    "maxNewEntriesPerDay": 5,
+    "cooldownAfterLosses": 3,
+    "cooldownMinutes": 240,
+    "correlationGroupMaxRiskPct": 1,
+    "correlationOverrideScoreDelta": 10,
+    "correlationOverrideSizeMult": 0.5
+  },
+  "categories": {
+    "fx_major": {
+      "minAtrPct": 0.03,
+      "maxAtrPct": 0.6,
+      "costBps": 1.5
+    },
+    "fx_minor": {
+      "minAtrPct": 0.04,
+      "maxAtrPct": 0.8,
+      "costBps": 3
+    },
+    "fx_exotic": {
+      "minAtrPct": 0.05,
+      "maxAtrPct": 1.5,
+      "costBps": 15
+    },
+    "index": {
+      "minAtrPct": 0.05,
+      "maxAtrPct": 1.2,
+      "costBps": 2
+    },
+    "metal": {
+      "minAtrPct": 0.05,
+      "maxAtrPct": 1.5,
+      "costBps": 3
+    },
+    "energy": {
+      "minAtrPct": 0.1,
+      "maxAtrPct": 2.5,
+      "costBps": 5
+    },
+    "agriculture": {
+      "minAtrPct": 0.08,
+      "maxAtrPct": 2,
+      "costBps": 8
+    },
+    "equity": {
+      "minAtrPct": 0.08,
+      "maxAtrPct": 2.5,
+      "costBps": 5
+    },
+    "etf": {
+      "minAtrPct": 0.05,
+      "maxAtrPct": 1.5,
+      "costBps": 3
+    },
+    "crypto": {
+      "minAtrPct": 0.15,
+      "maxAtrPct": 4,
+      "costBps": 10
+    }
+  },
+  "correlationGroups": {
+    "usd": {
+      "label": "Dollar américain",
+      "maxRiskPct": 1
+    },
+    "eur": {
+      "label": "Euro",
+      "maxRiskPct": 1
+    },
+    "gbp": {
+      "label": "Livre sterling",
+      "maxRiskPct": 0.75
+    },
+    "jpy": {
+      "label": "Yen",
+      "maxRiskPct": 1
+    },
+    "aud": {
+      "label": "Dollar australien",
+      "maxRiskPct": 0.75
+    },
+    "nzd": {
+      "label": "Dollar néo-zélandais",
+      "maxRiskPct": 0.5
+    },
+    "cad": {
+      "label": "Dollar canadien",
+      "maxRiskPct": 0.75
+    },
+    "chf": {
+      "label": "Franc suisse",
+      "maxRiskPct": 0.75
+    },
+    "metals": {
+      "label": "Métaux précieux",
+      "maxRiskPct": 0.75
+    },
+    "indices_us": {
+      "label": "Indices US",
+      "maxRiskPct": 1
+    },
+    "indices_eu": {
+      "label": "Indices européens",
+      "maxRiskPct": 0.75
+    },
+    "indices_asia": {
+      "label": "Indices asiatiques",
+      "maxRiskPct": 0.5
+    },
+    "energy": {
+      "label": "Énergie",
+      "maxRiskPct": 0.75
+    },
+    "agriculture": {
+      "label": "Agricoles",
+      "maxRiskPct": 0.5
+    },
+    "crypto": {
+      "label": "Cryptomonnaies",
+      "maxRiskPct": 0.5
+    },
+    "equity_tech": {
+      "label": "Actions technologiques",
+      "maxRiskPct": 0.75
+    },
+    "equity_financials": {
+      "label": "Actions financières",
+      "maxRiskPct": 0.75
+    },
+    "equity_energy": {
+      "label": "Actions énergie",
+      "maxRiskPct": 0.5
+    },
+    "equity_health": {
+      "label": "Actions santé",
+      "maxRiskPct": 0.5
+    },
+    "equity_consumer": {
+      "label": "Actions consommation",
+      "maxRiskPct": 0.5
+    },
+    "equity_industrials": {
+      "label": "Actions industrielles",
+      "maxRiskPct": 0.5
+    },
+    "equity_eu": {
+      "label": "Actions européennes",
+      "maxRiskPct": 0.75
+    },
+    "equity_asia": {
+      "label": "Actions asiatiques",
+      "maxRiskPct": 0.5
+    }
+  },
+  "assets": [
+    {
+      "std": "EURUSD",
+      "provider": "EUR/USD",
+      "name": "Euro / Dollar",
+      "category": "fx_major",
+      "assetClass": "fx",
+      "exchange": "FOREX",
+      "currency": "USD",
+      "country": "XX",
+      "enabled": true,
+      "groups": [
+        "usd:-1",
+        "eur:+1"
+      ]
+    },
+    {
+      "std": "GBPUSD",
+      "provider": "GBP/USD",
+      "name": "Livre / Dollar",
+      "category": "fx_major",
+      "assetClass": "fx",
+      "exchange": "FOREX",
+      "currency": "USD",
+      "country": "XX",
+      "enabled": true,
+      "groups": [
+        "usd:-1",
+        "gbp:+1"
+      ]
+    },
+    {
+      "std": "USDJPY",
+      "provider": "USD/JPY",
+      "name": "Dollar / Yen",
+      "category": "fx_major",
+      "assetClass": "fx",
+      "exchange": "FOREX",
+      "currency": "JPY",
+      "country": "XX",
+      "enabled": true,
+      "groups": [
+        "usd:+1",
+        "jpy:-1"
+      ]
+    },
+    {
+      "std": "USDCHF",
+      "provider": "USD/CHF",
+      "name": "Dollar / Franc suisse",
+      "category": "fx_major",
+      "assetClass": "fx",
+      "exchange": "FOREX",
+      "currency": "CHF",
+      "country": "XX",
+      "enabled": true,
+      "groups": [
+        "usd:+1",
+        "chf:-1"
+      ]
+    },
+    {
+      "std": "AUDUSD",
+      "provider": "AUD/USD",
+      "name": "Dollar australien / Dollar",
+      "category": "fx_major",
+      "assetClass": "fx",
+      "exchange": "FOREX",
+      "currency": "USD",
+      "country": "XX",
+      "enabled": true,
+      "groups": [
+        "usd:-1",
+        "aud:+1"
+      ]
+    },
+    {
+      "std": "USDCAD",
+      "provider": "USD/CAD",
+      "name": "Dollar / Dollar canadien",
+      "category": "fx_major",
+      "assetClass": "fx",
+      "exchange": "FOREX",
+      "currency": "CAD",
+      "country": "XX",
+      "enabled": true,
+      "groups": [
+        "usd:+1",
+        "cad:-1"
+      ]
+    },
+    {
+      "std": "NZDUSD",
+      "provider": "NZD/USD",
+      "name": "Dollar néo-zélandais / Dollar",
+      "category": "fx_major",
+      "assetClass": "fx",
+      "exchange": "FOREX",
+      "currency": "USD",
+      "country": "XX",
+      "enabled": true,
+      "groups": [
+        "usd:-1",
+        "nzd:+1"
+      ]
+    },
+    {
+      "std": "EURGBP",
+      "provider": "EUR/GBP",
+      "category": "fx_minor",
+      "assetClass": "fx",
+      "exchange": "FOREX",
+      "currency": "GBP",
+      "country": "XX",
+      "enabled": false,
+      "groups": [
+        "eur:+1",
+        "gbp:-1"
+      ],
+      "note": "[DÉSACTIVÉ le 22/08/2026 — budget crédits] Twelve Data gratuit plafonne à 800 crédits REST/jour ; 1 actif scanné en H1 = 24 crédits/jour, donc 33 actifs max. Réactivable directement (repasser enabled à true) si passage à un plan payant ou si SPC_MAX_SYMBOLS est relevé."
+    },
+    {
+      "std": "EURJPY",
+      "provider": "EUR/JPY",
+      "category": "fx_minor",
+      "assetClass": "fx",
+      "exchange": "FOREX",
+      "currency": "JPY",
+      "country": "XX",
+      "enabled": false,
+      "groups": [
+        "eur:+1",
+        "jpy:-1"
+      ],
+      "note": "[DÉSACTIVÉ le 22/08/2026 — budget crédits] Twelve Data gratuit plafonne à 800 crédits REST/jour ; 1 actif scanné en H1 = 24 crédits/jour, donc 33 actifs max. Réactivable directement (repasser enabled à true) si passage à un plan payant ou si SPC_MAX_SYMBOLS est relevé."
+    },
+    {
+      "std": "EURCHF",
+      "provider": "EUR/CHF",
+      "category": "fx_minor",
+      "assetClass": "fx",
+      "exchange": "FOREX",
+      "currency": "CHF",
+      "country": "XX",
+      "enabled": false,
+      "groups": [
+        "eur:+1",
+        "chf:-1"
+      ],
+      "note": "[DÉSACTIVÉ le 22/08/2026 — budget crédits] Twelve Data gratuit plafonne à 800 crédits REST/jour ; 1 actif scanné en H1 = 24 crédits/jour, donc 33 actifs max. Réactivable directement (repasser enabled à true) si passage à un plan payant ou si SPC_MAX_SYMBOLS est relevé."
+    },
+    {
+      "std": "EURAUD",
+      "provider": "EUR/AUD",
+      "category": "fx_minor",
+      "assetClass": "fx",
+      "exchange": "FOREX",
+      "currency": "AUD",
+      "country": "XX",
+      "enabled": false,
+      "groups": [
+        "eur:+1",
+        "aud:-1"
+      ],
+      "note": "[DÉSACTIVÉ le 22/08/2026 — budget crédits] Twelve Data gratuit plafonne à 800 crédits REST/jour ; 1 actif scanné en H1 = 24 crédits/jour, donc 33 actifs max. Réactivable directement (repasser enabled à true) si passage à un plan payant ou si SPC_MAX_SYMBOLS est relevé."
+    },
+    {
+      "std": "EURCAD",
+      "provider": "EUR/CAD",
+      "category": "fx_minor",
+      "assetClass": "fx",
+      "exchange": "FOREX",
+      "currency": "CAD",
+      "country": "XX",
+      "enabled": false,
+      "groups": [
+        "eur:+1",
+        "cad:-1"
+      ],
+      "note": "[DÉSACTIVÉ le 22/08/2026 — budget crédits] Twelve Data gratuit plafonne à 800 crédits REST/jour ; 1 actif scanné en H1 = 24 crédits/jour, donc 33 actifs max. Réactivable directement (repasser enabled à true) si passage à un plan payant ou si SPC_MAX_SYMBOLS est relevé."
+    },
+    {
+      "std": "EURNZD",
+      "provider": "EUR/NZD",
+      "category": "fx_minor",
+      "assetClass": "fx",
+      "exchange": "FOREX",
+      "currency": "NZD",
+      "country": "XX",
+      "enabled": false,
+      "groups": [
+        "eur:+1",
+        "nzd:-1"
+      ],
+      "note": "[DÉSACTIVÉ le 22/08/2026 — budget crédits] Twelve Data gratuit plafonne à 800 crédits REST/jour ; 1 actif scanné en H1 = 24 crédits/jour, donc 33 actifs max. Réactivable directement (repasser enabled à true) si passage à un plan payant ou si SPC_MAX_SYMBOLS est relevé."
+    },
+    {
+      "std": "GBPJPY",
+      "provider": "GBP/JPY",
+      "category": "fx_minor",
+      "assetClass": "fx",
+      "exchange": "FOREX",
+      "currency": "JPY",
+      "country": "XX",
+      "enabled": false,
+      "groups": [
+        "gbp:+1",
+        "jpy:-1"
+      ],
+      "note": "[DÉSACTIVÉ le 22/08/2026 — budget crédits] Twelve Data gratuit plafonne à 800 crédits REST/jour ; 1 actif scanné en H1 = 24 crédits/jour, donc 33 actifs max. Réactivable directement (repasser enabled à true) si passage à un plan payant ou si SPC_MAX_SYMBOLS est relevé."
+    },
+    {
+      "std": "GBPCHF",
+      "provider": "GBP/CHF",
+      "category": "fx_minor",
+      "assetClass": "fx",
+      "exchange": "FOREX",
+      "currency": "CHF",
+      "country": "XX",
+      "enabled": false,
+      "groups": [
+        "gbp:+1",
+        "chf:-1"
+      ],
+      "note": "[DÉSACTIVÉ le 22/08/2026 — budget crédits] Twelve Data gratuit plafonne à 800 crédits REST/jour ; 1 actif scanné en H1 = 24 crédits/jour, donc 33 actifs max. Réactivable directement (repasser enabled à true) si passage à un plan payant ou si SPC_MAX_SYMBOLS est relevé."
+    },
+    {
+      "std": "GBPAUD",
+      "provider": "GBP/AUD",
+      "category": "fx_minor",
+      "assetClass": "fx",
+      "exchange": "FOREX",
+      "currency": "AUD",
+      "country": "XX",
+      "enabled": false,
+      "groups": [
+        "gbp:+1",
+        "aud:-1"
+      ],
+      "note": "[DÉSACTIVÉ le 22/08/2026 — budget crédits] Twelve Data gratuit plafonne à 800 crédits REST/jour ; 1 actif scanné en H1 = 24 crédits/jour, donc 33 actifs max. Réactivable directement (repasser enabled à true) si passage à un plan payant ou si SPC_MAX_SYMBOLS est relevé."
+    },
+    {
+      "std": "GBPCAD",
+      "provider": "GBP/CAD",
+      "category": "fx_minor",
+      "assetClass": "fx",
+      "exchange": "FOREX",
+      "currency": "CAD",
+      "country": "XX",
+      "enabled": false,
+      "groups": [
+        "gbp:+1",
+        "cad:-1"
+      ],
+      "note": "[DÉSACTIVÉ le 22/08/2026 — budget crédits] Twelve Data gratuit plafonne à 800 crédits REST/jour ; 1 actif scanné en H1 = 24 crédits/jour, donc 33 actifs max. Réactivable directement (repasser enabled à true) si passage à un plan payant ou si SPC_MAX_SYMBOLS est relevé."
+    },
+    {
+      "std": "AUDJPY",
+      "provider": "AUD/JPY",
+      "category": "fx_minor",
+      "assetClass": "fx",
+      "exchange": "FOREX",
+      "currency": "JPY",
+      "country": "XX",
+      "enabled": false,
+      "groups": [
+        "aud:+1",
+        "jpy:-1"
+      ],
+      "note": "[DÉSACTIVÉ le 22/08/2026 — budget crédits] Twelve Data gratuit plafonne à 800 crédits REST/jour ; 1 actif scanné en H1 = 24 crédits/jour, donc 33 actifs max. Réactivable directement (repasser enabled à true) si passage à un plan payant ou si SPC_MAX_SYMBOLS est relevé."
+    },
+    {
+      "std": "AUDNZD",
+      "provider": "AUD/NZD",
+      "category": "fx_minor",
+      "assetClass": "fx",
+      "exchange": "FOREX",
+      "currency": "NZD",
+      "country": "XX",
+      "enabled": false,
+      "groups": [
+        "aud:+1",
+        "nzd:-1"
+      ],
+      "note": "[DÉSACTIVÉ le 22/08/2026 — budget crédits] Twelve Data gratuit plafonne à 800 crédits REST/jour ; 1 actif scanné en H1 = 24 crédits/jour, donc 33 actifs max. Réactivable directement (repasser enabled à true) si passage à un plan payant ou si SPC_MAX_SYMBOLS est relevé."
+    },
+    {
+      "std": "AUDCAD",
+      "provider": "AUD/CAD",
+      "category": "fx_minor",
+      "assetClass": "fx",
+      "exchange": "FOREX",
+      "currency": "CAD",
+      "country": "XX",
+      "enabled": false,
+      "groups": [
+        "aud:+1",
+        "cad:-1"
+      ],
+      "note": "[DÉSACTIVÉ le 22/08/2026 — budget crédits] Twelve Data gratuit plafonne à 800 crédits REST/jour ; 1 actif scanné en H1 = 24 crédits/jour, donc 33 actifs max. Réactivable directement (repasser enabled à true) si passage à un plan payant ou si SPC_MAX_SYMBOLS est relevé."
+    },
+    {
+      "std": "CADJPY",
+      "provider": "CAD/JPY",
+      "category": "fx_minor",
+      "assetClass": "fx",
+      "exchange": "FOREX",
+      "currency": "JPY",
+      "country": "XX",
+      "enabled": false,
+      "groups": [
+        "cad:+1",
+        "jpy:-1"
+      ],
+      "note": "[DÉSACTIVÉ le 22/08/2026 — budget crédits] Twelve Data gratuit plafonne à 800 crédits REST/jour ; 1 actif scanné en H1 = 24 crédits/jour, donc 33 actifs max. Réactivable directement (repasser enabled à true) si passage à un plan payant ou si SPC_MAX_SYMBOLS est relevé."
+    },
+    {
+      "std": "CHFJPY",
+      "provider": "CHF/JPY",
+      "category": "fx_minor",
+      "assetClass": "fx",
+      "exchange": "FOREX",
+      "currency": "JPY",
+      "country": "XX",
+      "enabled": false,
+      "groups": [
+        "chf:+1",
+        "jpy:-1"
+      ],
+      "note": "[DÉSACTIVÉ le 22/08/2026 — budget crédits] Twelve Data gratuit plafonne à 800 crédits REST/jour ; 1 actif scanné en H1 = 24 crédits/jour, donc 33 actifs max. Réactivable directement (repasser enabled à true) si passage à un plan payant ou si SPC_MAX_SYMBOLS est relevé."
+    },
+    {
+      "std": "USDMXN",
+      "provider": "USD/MXN",
+      "category": "fx_exotic",
+      "assetClass": "fx",
+      "exchange": "FOREX",
+      "currency": "MXN",
+      "country": "XX",
+      "enabled": false,
+      "groups": [
+        "usd:+1"
+      ],
+      "note": "[DÉSACTIVÉ le 22/08/2026 — budget crédits] Twelve Data gratuit plafonne à 800 crédits REST/jour ; 1 actif scanné en H1 = 24 crédits/jour, donc 33 actifs max. Réactivable directement (repasser enabled à true) si passage à un plan payant ou si SPC_MAX_SYMBOLS est relevé."
+    },
+    {
+      "std": "USDZAR",
+      "provider": "USD/ZAR",
+      "category": "fx_exotic",
+      "assetClass": "fx",
+      "exchange": "FOREX",
+      "currency": "ZAR",
+      "country": "XX",
+      "enabled": false,
+      "groups": [
+        "usd:+1"
+      ],
+      "note": "[DÉSACTIVÉ le 22/08/2026 — budget crédits] Twelve Data gratuit plafonne à 800 crédits REST/jour ; 1 actif scanné en H1 = 24 crédits/jour, donc 33 actifs max. Réactivable directement (repasser enabled à true) si passage à un plan payant ou si SPC_MAX_SYMBOLS est relevé."
+    },
+    {
+      "std": "USDSEK",
+      "provider": "USD/SEK",
+      "category": "fx_exotic",
+      "assetClass": "fx",
+      "exchange": "FOREX",
+      "currency": "SEK",
+      "country": "XX",
+      "enabled": false,
+      "groups": [
+        "usd:+1"
+      ],
+      "note": "[DÉSACTIVÉ le 22/08/2026 — budget crédits] Twelve Data gratuit plafonne à 800 crédits REST/jour ; 1 actif scanné en H1 = 24 crédits/jour, donc 33 actifs max. Réactivable directement (repasser enabled à true) si passage à un plan payant ou si SPC_MAX_SYMBOLS est relevé."
+    },
+    {
+      "std": "USDNOK",
+      "provider": "USD/NOK",
+      "category": "fx_exotic",
+      "assetClass": "fx",
+      "exchange": "FOREX",
+      "currency": "NOK",
+      "country": "XX",
+      "enabled": false,
+      "groups": [
+        "usd:+1"
+      ],
+      "note": "[DÉSACTIVÉ le 22/08/2026 — budget crédits] Twelve Data gratuit plafonne à 800 crédits REST/jour ; 1 actif scanné en H1 = 24 crédits/jour, donc 33 actifs max. Réactivable directement (repasser enabled à true) si passage à un plan payant ou si SPC_MAX_SYMBOLS est relevé."
+    },
+    {
+      "std": "USDSGD",
+      "provider": "USD/SGD",
+      "category": "fx_exotic",
+      "assetClass": "fx",
+      "exchange": "FOREX",
+      "currency": "SGD",
+      "country": "XX",
+      "enabled": false,
+      "groups": [
+        "usd:+1"
+      ],
+      "note": "[DÉSACTIVÉ le 22/08/2026 — budget crédits] Twelve Data gratuit plafonne à 800 crédits REST/jour ; 1 actif scanné en H1 = 24 crédits/jour, donc 33 actifs max. Réactivable directement (repasser enabled à true) si passage à un plan payant ou si SPC_MAX_SYMBOLS est relevé."
+    },
+    {
+      "std": "USDPLN",
+      "provider": "USD/PLN",
+      "category": "fx_exotic",
+      "assetClass": "fx",
+      "exchange": "FOREX",
+      "currency": "PLN",
+      "country": "XX",
+      "enabled": false,
+      "groups": [
+        "usd:+1"
+      ],
+      "note": "[DÉSACTIVÉ le 22/08/2026 — budget crédits] Twelve Data gratuit plafonne à 800 crédits REST/jour ; 1 actif scanné en H1 = 24 crédits/jour, donc 33 actifs max. Réactivable directement (repasser enabled à true) si passage à un plan payant ou si SPC_MAX_SYMBOLS est relevé."
+    },
+    {
+      "std": "USDTRY",
+      "provider": "USD/TRY",
+      "category": "fx_exotic",
+      "assetClass": "fx",
+      "exchange": "FOREX",
+      "currency": "TRY",
+      "country": "XX",
+      "enabled": false,
+      "note": "Spread et gaps extrêmes — désactivé volontairement. [À VÉRIFIER PAR CYRIL avant activation]",
+      "groups": [
+        "usd:+1"
+      ]
+    },
+    {
+      "std": "XAUUSD",
+      "provider": "XAU/USD",
+      "name": "Or",
+      "category": "metal",
+      "assetClass": "fx",
+      "exchange": "FOREX",
+      "currency": "USD",
+      "country": "XX",
+      "enabled": true,
+      "groups": [
+        "metals:+1",
+        "usd:-1"
+      ]
+    },
+    {
+      "std": "XAGUSD",
+      "provider": "XAG/USD",
+      "name": "Argent",
+      "category": "metal",
+      "assetClass": "fx",
+      "exchange": "FOREX",
+      "currency": "USD",
+      "country": "XX",
+      "enabled": true,
+      "groups": [
+        "metals:+1",
+        "usd:-1"
+      ]
+    },
+    {
+      "std": "XPTUSD",
+      "provider": "XPT/USD",
+      "name": "Platine",
+      "category": "metal",
+      "assetClass": "fx",
+      "exchange": "FOREX",
+      "currency": "USD",
+      "country": "XX",
+      "enabled": false,
+      "note": "[À VÉRIFIER CHEZ LE COURTIER] disponibilité et liquidité du platine spot",
+      "groups": [
+        "metals:+1",
+        "usd:-1"
+      ]
+    },
+    {
+      "std": "XPDUSD",
+      "provider": "XPD/USD",
+      "name": "Palladium",
+      "category": "metal",
+      "assetClass": "fx",
+      "exchange": "FOREX",
+      "currency": "USD",
+      "country": "XX",
+      "enabled": false,
+      "note": "[À VÉRIFIER CHEZ LE COURTIER] disponibilité et liquidité du palladium spot",
+      "groups": [
+        "metals:+1",
+        "usd:-1"
+      ]
+    },
+    {
+      "std": "US500",
+      "provider": "SPX",
+      "name": "S&P 500",
+      "category": "index",
+      "assetClass": "equity",
+      "exchange": "NYSE",
+      "currency": "USD",
+      "country": "US",
+      "enabled": true,
+      "groups": [
+        "indices_us:+1"
+      ]
+    },
+    {
+      "std": "NAS100",
+      "provider": "NDX",
+      "name": "Nasdaq 100",
+      "category": "index",
+      "assetClass": "equity",
+      "exchange": "NASDAQ",
+      "currency": "USD",
+      "country": "US",
+      "enabled": true,
+      "groups": [
+        "indices_us:+1",
+        "equity_tech:+1"
+      ]
+    },
+    {
+      "std": "US30",
+      "provider": "DJI",
+      "name": "Dow Jones 30",
+      "category": "index",
+      "assetClass": "equity",
+      "exchange": "NYSE",
+      "currency": "USD",
+      "country": "US",
+      "enabled": true,
+      "groups": [
+        "indices_us:+1"
+      ]
+    },
+    {
+      "std": "US2000",
+      "provider": "RUT",
+      "name": "Russell 2000",
+      "category": "index",
+      "assetClass": "equity",
+      "exchange": "NYSE",
+      "currency": "USD",
+      "country": "US",
+      "enabled": false,
+      "groups": [
+        "indices_us:+1"
+      ],
+      "note": "[DÉSACTIVÉ le 22/08/2026 — budget crédits] Twelve Data gratuit plafonne à 800 crédits REST/jour ; 1 actif scanné en H1 = 24 crédits/jour, donc 33 actifs max. Réactivable directement (repasser enabled à true) si passage à un plan payant ou si SPC_MAX_SYMBOLS est relevé."
+    },
+    {
+      "std": "GER40",
+      "provider": "DAX",
+      "name": "DAX 40",
+      "category": "index",
+      "assetClass": "equity",
+      "exchange": "XETR",
+      "currency": "EUR",
+      "country": "DE",
+      "enabled": false,
+      "note": "[CORRIGÉ le 22/08/2026] GDAXI → DAX. Twelve Data liste l'indice sous 'DAX' (pas 'GDAXI', qui est le ticker Yahoo Finance). Reste à vérifier en conditions réelles avant activation.",
+      "groups": [
+        "indices_eu:+1"
+      ]
+    },
+    {
+      "std": "UK100",
+      "provider": "FTSE",
+      "name": "FTSE 100",
+      "category": "index",
+      "assetClass": "equity",
+      "exchange": "LSE",
+      "currency": "GBP",
+      "country": "GB",
+      "enabled": false,
+      "note": "[CORRIGÉ le 22/08/2026] UKX → FTSE. Twelve Data liste l'indice sous 'FTSE' (pas 'UKX', qui est le ticker Bloomberg). Reste à vérifier en conditions réelles avant activation.",
+      "groups": [
+        "indices_eu:+1"
+      ]
+    },
+    {
+      "std": "FRA40",
+      "provider": "FCHI",
+      "name": "CAC 40",
+      "category": "index",
+      "assetClass": "equity",
+      "exchange": "Euronext",
+      "currency": "EUR",
+      "country": "FR",
+      "enabled": false,
+      "note": "[À VÉRIFIER CHEZ LE COURTIER] symbole d'indice européen — varie selon le fournisseur",
+      "groups": [
+        "indices_eu:+1"
+      ]
+    },
+    {
+      "std": "EU50",
+      "provider": "STOXX50E",
+      "name": "Euro Stoxx 50",
+      "category": "index",
+      "assetClass": "equity",
+      "exchange": "Euronext",
+      "currency": "EUR",
+      "country": "FR",
+      "enabled": false,
+      "note": "[CORRIGÉ le 22/08/2026] SX5E → STOXX50E. Confirmé sur twelvedata.com/markets : 'ESTX 50 PR.EUR (STOXX50E)'. Reste à vérifier en conditions réelles avant activation.",
+      "groups": [
+        "indices_eu:+1"
+      ]
+    },
+    {
+      "std": "JP225",
+      "provider": "N225",
+      "name": "Nikkei 225",
+      "category": "index",
+      "assetClass": "equity",
+      "exchange": "TSE",
+      "currency": "JPY",
+      "country": "JP",
+      "enabled": false,
+      "note": "[À VÉRIFIER CHEZ LE COURTIER] symbole d'indice asiatique — varie selon le fournisseur",
+      "groups": [
+        "indices_asia:+1"
+      ]
+    },
+    {
+      "std": "HK50",
+      "provider": "HSI",
+      "name": "Hang Seng",
+      "category": "index",
+      "assetClass": "equity",
+      "exchange": "HKEX",
+      "currency": "HKD",
+      "country": "HK",
+      "enabled": false,
+      "note": "[À VÉRIFIER CHEZ LE COURTIER] Twelve Data semble traiter le Hang Seng comme une action HKEX (code numérique), pas comme un indice classique — tester /symbol_search avant d'activer.",
+      "groups": [
+        "indices_asia:+1"
+      ]
+    },
+    {
+      "std": "WTIUSD",
+      "provider": "WTI/USD",
+      "name": "Pétrole WTI",
+      "category": "energy",
+      "assetClass": "fx",
+      "exchange": "FOREX",
+      "currency": "USD",
+      "country": "XX",
+      "enabled": false,
+      "note": "[À VÉRIFIER CHEZ LE COURTIER] symbole des matières premières — souvent réservé aux plans payants",
+      "groups": [
+        "energy:+1"
+      ]
+    },
+    {
+      "std": "BRENTUSD",
+      "provider": "XBR/USD",
+      "name": "Pétrole Brent",
+      "category": "energy",
+      "assetClass": "fx",
+      "exchange": "FOREX",
+      "currency": "USD",
+      "country": "XX",
+      "enabled": false,
+      "note": "[CORRIGÉ le 22/08/2026] BRENT/USD → XBR/USD. Confirmé sur twelvedata.com/markets : 'Brent Spot / US Dollar (XBR/USD)', pas 'BRENT/USD'. Reste à vérifier en conditions réelles avant activation.",
+      "groups": [
+        "energy:+1"
+      ]
+    },
+    {
+      "std": "NATGASUSD",
+      "provider": "NG/USD",
+      "name": "Gaz naturel",
+      "category": "energy",
+      "assetClass": "fx",
+      "exchange": "FOREX",
+      "currency": "USD",
+      "country": "XX",
+      "enabled": false,
+      "note": "[À VÉRIFIER CHEZ LE COURTIER] 'NG/USD' non confirmé — Twelve Data propose un ETC 'GAS' (Milan) plutôt qu'un spot direct clair. Volatilité extrême de toute façon : à activer en dernier.",
+      "groups": [
+        "energy:+1"
+      ]
+    },
+    {
+      "std": "CORN",
+      "provider": "CORN",
+      "name": "Maïs (ETF proxy)",
+      "category": "agriculture",
+      "assetClass": "equity",
+      "exchange": "NYSE",
+      "currency": "USD",
+      "country": "US",
+      "enabled": false,
+      "note": "[À VÉRIFIER PAR CYRIL] proxy ETF, pas le future — comportement différent du sous-jacent",
+      "groups": [
+        "agriculture:+1"
+      ]
+    },
+    {
+      "std": "WEAT",
+      "provider": "WEAT",
+      "name": "Blé (ETF proxy)",
+      "category": "agriculture",
+      "assetClass": "equity",
+      "exchange": "NYSE",
+      "currency": "USD",
+      "country": "US",
+      "enabled": false,
+      "note": "[À VÉRIFIER PAR CYRIL] proxy ETF, pas le future — comportement différent du sous-jacent",
+      "groups": [
+        "agriculture:+1"
+      ]
+    },
+    {
+      "std": "SOYB",
+      "provider": "SOYB",
+      "name": "Soja (ETF proxy)",
+      "category": "agriculture",
+      "assetClass": "equity",
+      "exchange": "NYSE",
+      "currency": "USD",
+      "country": "US",
+      "enabled": false,
+      "note": "[À VÉRIFIER PAR CYRIL] proxy ETF, pas le future — comportement différent du sous-jacent",
+      "groups": [
+        "agriculture:+1"
+      ]
+    },
+    {
+      "std": "SPY",
+      "provider": "SPY",
+      "name": "SPDR S&P 500",
+      "category": "etf",
+      "assetClass": "equity",
+      "exchange": "NYSE",
+      "currency": "USD",
+      "country": "US",
+      "enabled": false,
+      "groups": [
+        "indices_us:+1"
+      ],
+      "note": "[DÉSACTIVÉ le 22/08/2026 — budget crédits] Twelve Data gratuit plafonne à 800 crédits REST/jour ; 1 actif scanné en H1 = 24 crédits/jour, donc 33 actifs max. Réactivable directement (repasser enabled à true) si passage à un plan payant ou si SPC_MAX_SYMBOLS est relevé."
+    },
+    {
+      "std": "QQQ",
+      "provider": "QQQ",
+      "name": "Invesco Nasdaq 100",
+      "category": "etf",
+      "assetClass": "equity",
+      "exchange": "NASDAQ",
+      "currency": "USD",
+      "country": "US",
+      "enabled": false,
+      "groups": [
+        "indices_us:+1",
+        "equity_tech:+1"
+      ],
+      "note": "[DÉSACTIVÉ le 22/08/2026 — budget crédits] Twelve Data gratuit plafonne à 800 crédits REST/jour ; 1 actif scanné en H1 = 24 crédits/jour, donc 33 actifs max. Réactivable directement (repasser enabled à true) si passage à un plan payant ou si SPC_MAX_SYMBOLS est relevé."
+    },
+    {
+      "std": "DIA",
+      "provider": "DIA",
+      "name": "SPDR Dow Jones",
+      "category": "etf",
+      "assetClass": "equity",
+      "exchange": "NYSE",
+      "currency": "USD",
+      "country": "US",
+      "enabled": false,
+      "groups": [
+        "indices_us:+1"
+      ],
+      "note": "[DÉSACTIVÉ le 22/08/2026 — budget crédits] Twelve Data gratuit plafonne à 800 crédits REST/jour ; 1 actif scanné en H1 = 24 crédits/jour, donc 33 actifs max. Réactivable directement (repasser enabled à true) si passage à un plan payant ou si SPC_MAX_SYMBOLS est relevé."
+    },
+    {
+      "std": "IWM",
+      "provider": "IWM",
+      "name": "iShares Russell 2000",
+      "category": "etf",
+      "assetClass": "equity",
+      "exchange": "NYSE",
+      "currency": "USD",
+      "country": "US",
+      "enabled": false,
+      "groups": [
+        "indices_us:+1"
+      ],
+      "note": "[DÉSACTIVÉ le 22/08/2026 — budget crédits] Twelve Data gratuit plafonne à 800 crédits REST/jour ; 1 actif scanné en H1 = 24 crédits/jour, donc 33 actifs max. Réactivable directement (repasser enabled à true) si passage à un plan payant ou si SPC_MAX_SYMBOLS est relevé."
+    },
+    {
+      "std": "EEM",
+      "provider": "EEM",
+      "name": "iShares Émergents",
+      "category": "etf",
+      "assetClass": "equity",
+      "exchange": "NYSE",
+      "currency": "USD",
+      "country": "US",
+      "enabled": false,
+      "groups": [],
+      "note": "[DÉSACTIVÉ le 22/08/2026 — budget crédits] Twelve Data gratuit plafonne à 800 crédits REST/jour ; 1 actif scanné en H1 = 24 crédits/jour, donc 33 actifs max. Réactivable directement (repasser enabled à true) si passage à un plan payant ou si SPC_MAX_SYMBOLS est relevé."
+    },
+    {
+      "std": "TLT",
+      "provider": "TLT",
+      "name": "iShares Treasury 20+",
+      "category": "etf",
+      "assetClass": "equity",
+      "exchange": "NASDAQ",
+      "currency": "USD",
+      "country": "US",
+      "enabled": false,
+      "groups": [],
+      "note": "[DÉSACTIVÉ le 22/08/2026 — budget crédits] Twelve Data gratuit plafonne à 800 crédits REST/jour ; 1 actif scanné en H1 = 24 crédits/jour, donc 33 actifs max. Réactivable directement (repasser enabled à true) si passage à un plan payant ou si SPC_MAX_SYMBOLS est relevé."
+    },
+    {
+      "std": "GLD",
+      "provider": "GLD",
+      "name": "SPDR Gold",
+      "category": "etf",
+      "assetClass": "equity",
+      "exchange": "NYSE",
+      "currency": "USD",
+      "country": "US",
+      "enabled": false,
+      "groups": [
+        "metals:+1"
+      ],
+      "note": "[DÉSACTIVÉ le 22/08/2026 — budget crédits] Twelve Data gratuit plafonne à 800 crédits REST/jour ; 1 actif scanné en H1 = 24 crédits/jour, donc 33 actifs max. Réactivable directement (repasser enabled à true) si passage à un plan payant ou si SPC_MAX_SYMBOLS est relevé."
+    },
+    {
+      "std": "XLF",
+      "provider": "XLF",
+      "name": "Financials Select",
+      "category": "etf",
+      "assetClass": "equity",
+      "exchange": "NYSE",
+      "currency": "USD",
+      "country": "US",
+      "enabled": false,
+      "groups": [
+        "indices_us:+1",
+        "equity_financials:+1"
+      ],
+      "note": "[DÉSACTIVÉ le 22/08/2026 — budget crédits] Twelve Data gratuit plafonne à 800 crédits REST/jour ; 1 actif scanné en H1 = 24 crédits/jour, donc 33 actifs max. Réactivable directement (repasser enabled à true) si passage à un plan payant ou si SPC_MAX_SYMBOLS est relevé."
+    },
+    {
+      "std": "BTCUSD",
+      "provider": "BTC/USD",
+      "name": "Bitcoin",
+      "category": "crypto",
+      "assetClass": "crypto",
+      "exchange": "CRYPTO",
+      "currency": "USD",
+      "country": "XX",
+      "enabled": true,
+      "groups": [
+        "crypto:+1"
+      ]
+    },
+    {
+      "std": "ETHUSD",
+      "provider": "ETH/USD",
+      "name": "Ethereum",
+      "category": "crypto",
+      "assetClass": "crypto",
+      "exchange": "CRYPTO",
+      "currency": "USD",
+      "country": "XX",
+      "enabled": true,
+      "groups": [
+        "crypto:+1"
+      ]
+    },
+    {
+      "std": "SOLUSD",
+      "provider": "SOL/USD",
+      "name": "Solana",
+      "category": "crypto",
+      "assetClass": "crypto",
+      "exchange": "CRYPTO",
+      "currency": "USD",
+      "country": "XX",
+      "enabled": false,
+      "note": "[À VÉRIFIER CHEZ LE COURTIER] disponibilité + spread acceptable avant activation",
+      "groups": [
+        "crypto:+1"
+      ]
+    },
+    {
+      "std": "XRPUSD",
+      "provider": "XRP/USD",
+      "name": "XRP",
+      "category": "crypto",
+      "assetClass": "crypto",
+      "exchange": "CRYPTO",
+      "currency": "USD",
+      "country": "XX",
+      "enabled": false,
+      "note": "[À VÉRIFIER CHEZ LE COURTIER] disponibilité + spread acceptable avant activation",
+      "groups": [
+        "crypto:+1"
+      ]
+    },
+    {
+      "std": "ADAUSD",
+      "provider": "ADA/USD",
+      "name": "Cardano",
+      "category": "crypto",
+      "assetClass": "crypto",
+      "exchange": "CRYPTO",
+      "currency": "USD",
+      "country": "XX",
+      "enabled": false,
+      "note": "[À VÉRIFIER CHEZ LE COURTIER] disponibilité + spread acceptable avant activation",
+      "groups": [
+        "crypto:+1"
+      ]
+    },
+    {
+      "std": "AAPL",
+      "provider": "AAPL",
+      "name": "Apple",
+      "category": "equity",
+      "assetClass": "equity",
+      "exchange": "NASDAQ",
+      "currency": "USD",
+      "country": "US",
+      "sector": "tech",
+      "enabled": true,
+      "groups": [
+        "equity_tech:+1",
+        "indices_us:+1"
+      ]
+    },
+    {
+      "std": "MSFT",
+      "provider": "MSFT",
+      "name": "Microsoft",
+      "category": "equity",
+      "assetClass": "equity",
+      "exchange": "NASDAQ",
+      "currency": "USD",
+      "country": "US",
+      "sector": "tech",
+      "enabled": true,
+      "groups": [
+        "equity_tech:+1",
+        "indices_us:+1"
+      ]
+    },
+    {
+      "std": "NVDA",
+      "provider": "NVDA",
+      "name": "Nvidia",
+      "category": "equity",
+      "assetClass": "equity",
+      "exchange": "NASDAQ",
+      "currency": "USD",
+      "country": "US",
+      "sector": "tech",
+      "enabled": true,
+      "groups": [
+        "equity_tech:+1",
+        "indices_us:+1"
+      ]
+    },
+    {
+      "std": "AMZN",
+      "provider": "AMZN",
+      "name": "Amazon",
+      "category": "equity",
+      "assetClass": "equity",
+      "exchange": "NASDAQ",
+      "currency": "USD",
+      "country": "US",
+      "sector": "consumer",
+      "enabled": true,
+      "groups": [
+        "equity_consumer:+1",
+        "indices_us:+1"
+      ]
+    },
+    {
+      "std": "GOOGL",
+      "provider": "GOOGL",
+      "name": "Alphabet",
+      "category": "equity",
+      "assetClass": "equity",
+      "exchange": "NASDAQ",
+      "currency": "USD",
+      "country": "US",
+      "sector": "tech",
+      "enabled": true,
+      "groups": [
+        "equity_tech:+1",
+        "indices_us:+1"
+      ]
+    },
+    {
+      "std": "META",
+      "provider": "META",
+      "name": "Meta",
+      "category": "equity",
+      "assetClass": "equity",
+      "exchange": "NASDAQ",
+      "currency": "USD",
+      "country": "US",
+      "sector": "tech",
+      "enabled": true,
+      "groups": [
+        "equity_tech:+1",
+        "indices_us:+1"
+      ]
+    },
+    {
+      "std": "AVGO",
+      "provider": "AVGO",
+      "name": "Broadcom",
+      "category": "equity",
+      "assetClass": "equity",
+      "exchange": "NASDAQ",
+      "currency": "USD",
+      "country": "US",
+      "sector": "tech",
+      "enabled": false,
+      "groups": [
+        "equity_tech:+1",
+        "indices_us:+1"
+      ],
+      "note": "[DÉSACTIVÉ le 22/08/2026 — budget crédits] Twelve Data gratuit plafonne à 800 crédits REST/jour ; 1 actif scanné en H1 = 24 crédits/jour, donc 33 actifs max. Réactivable directement (repasser enabled à true) si passage à un plan payant ou si SPC_MAX_SYMBOLS est relevé."
+    },
+    {
+      "std": "ORCL",
+      "provider": "ORCL",
+      "name": "Oracle",
+      "category": "equity",
+      "assetClass": "equity",
+      "exchange": "NYSE",
+      "currency": "USD",
+      "country": "US",
+      "sector": "tech",
+      "enabled": false,
+      "groups": [
+        "equity_tech:+1",
+        "indices_us:+1"
+      ],
+      "note": "[DÉSACTIVÉ le 22/08/2026 — budget crédits] Twelve Data gratuit plafonne à 800 crédits REST/jour ; 1 actif scanné en H1 = 24 crédits/jour, donc 33 actifs max. Réactivable directement (repasser enabled à true) si passage à un plan payant ou si SPC_MAX_SYMBOLS est relevé."
+    },
+    {
+      "std": "AMD",
+      "provider": "AMD",
+      "name": "AMD",
+      "category": "equity",
+      "assetClass": "equity",
+      "exchange": "NASDAQ",
+      "currency": "USD",
+      "country": "US",
+      "sector": "tech",
+      "enabled": false,
+      "groups": [
+        "equity_tech:+1",
+        "indices_us:+1"
+      ],
+      "note": "[DÉSACTIVÉ le 22/08/2026 — budget crédits] Twelve Data gratuit plafonne à 800 crédits REST/jour ; 1 actif scanné en H1 = 24 crédits/jour, donc 33 actifs max. Réactivable directement (repasser enabled à true) si passage à un plan payant ou si SPC_MAX_SYMBOLS est relevé."
+    },
+    {
+      "std": "CRM",
+      "provider": "CRM",
+      "name": "Salesforce",
+      "category": "equity",
+      "assetClass": "equity",
+      "exchange": "NYSE",
+      "currency": "USD",
+      "country": "US",
+      "sector": "tech",
+      "enabled": false,
+      "groups": [
+        "equity_tech:+1",
+        "indices_us:+1"
+      ],
+      "note": "[DÉSACTIVÉ le 22/08/2026 — budget crédits] Twelve Data gratuit plafonne à 800 crédits REST/jour ; 1 actif scanné en H1 = 24 crédits/jour, donc 33 actifs max. Réactivable directement (repasser enabled à true) si passage à un plan payant ou si SPC_MAX_SYMBOLS est relevé."
+    },
+    {
+      "std": "JPM",
+      "provider": "JPM",
+      "name": "JPMorgan",
+      "category": "equity",
+      "assetClass": "equity",
+      "exchange": "NYSE",
+      "currency": "USD",
+      "country": "US",
+      "sector": "financials",
+      "enabled": true,
+      "groups": [
+        "equity_financials:+1",
+        "indices_us:+1"
+      ]
+    },
+    {
+      "std": "BAC",
+      "provider": "BAC",
+      "name": "Bank of America",
+      "category": "equity",
+      "assetClass": "equity",
+      "exchange": "NYSE",
+      "currency": "USD",
+      "country": "US",
+      "sector": "financials",
+      "enabled": false,
+      "groups": [
+        "equity_financials:+1",
+        "indices_us:+1"
+      ],
+      "note": "[DÉSACTIVÉ le 22/08/2026 — budget crédits] Twelve Data gratuit plafonne à 800 crédits REST/jour ; 1 actif scanné en H1 = 24 crédits/jour, donc 33 actifs max. Réactivable directement (repasser enabled à true) si passage à un plan payant ou si SPC_MAX_SYMBOLS est relevé."
+    },
+    {
+      "std": "V",
+      "provider": "V",
+      "name": "Visa",
+      "category": "equity",
+      "assetClass": "equity",
+      "exchange": "NYSE",
+      "currency": "USD",
+      "country": "US",
+      "sector": "financials",
+      "enabled": true,
+      "groups": [
+        "equity_financials:+1",
+        "indices_us:+1"
+      ]
+    },
+    {
+      "std": "MA",
+      "provider": "MA",
+      "name": "Mastercard",
+      "category": "equity",
+      "assetClass": "equity",
+      "exchange": "NYSE",
+      "currency": "USD",
+      "country": "US",
+      "sector": "financials",
+      "enabled": false,
+      "groups": [
+        "equity_financials:+1",
+        "indices_us:+1"
+      ],
+      "note": "[DÉSACTIVÉ le 22/08/2026 — budget crédits] Twelve Data gratuit plafonne à 800 crédits REST/jour ; 1 actif scanné en H1 = 24 crédits/jour, donc 33 actifs max. Réactivable directement (repasser enabled à true) si passage à un plan payant ou si SPC_MAX_SYMBOLS est relevé."
+    },
+    {
+      "std": "GS",
+      "provider": "GS",
+      "name": "Goldman Sachs",
+      "category": "equity",
+      "assetClass": "equity",
+      "exchange": "NYSE",
+      "currency": "USD",
+      "country": "US",
+      "sector": "financials",
+      "enabled": true,
+      "groups": [
+        "equity_financials:+1",
+        "indices_us:+1"
+      ]
+    },
+    {
+      "std": "UNH",
+      "provider": "UNH",
+      "name": "UnitedHealth",
+      "category": "equity",
+      "assetClass": "equity",
+      "exchange": "NYSE",
+      "currency": "USD",
+      "country": "US",
+      "sector": "healthcare",
+      "enabled": true,
+      "groups": [
+        "equity_health:+1",
+        "indices_us:+1"
+      ]
+    },
+    {
+      "std": "JNJ",
+      "provider": "JNJ",
+      "name": "Johnson & Johnson",
+      "category": "equity",
+      "assetClass": "equity",
+      "exchange": "NYSE",
+      "currency": "USD",
+      "country": "US",
+      "sector": "healthcare",
+      "enabled": false,
+      "groups": [
+        "equity_health:+1",
+        "indices_us:+1"
+      ],
+      "note": "[DÉSACTIVÉ le 22/08/2026 — budget crédits] Twelve Data gratuit plafonne à 800 crédits REST/jour ; 1 actif scanné en H1 = 24 crédits/jour, donc 33 actifs max. Réactivable directement (repasser enabled à true) si passage à un plan payant ou si SPC_MAX_SYMBOLS est relevé."
+    },
+    {
+      "std": "LLY",
+      "provider": "LLY",
+      "name": "Eli Lilly",
+      "category": "equity",
+      "assetClass": "equity",
+      "exchange": "NYSE",
+      "currency": "USD",
+      "country": "US",
+      "sector": "healthcare",
+      "enabled": true,
+      "groups": [
+        "equity_health:+1",
+        "indices_us:+1"
+      ]
+    },
+    {
+      "std": "ABBV",
+      "provider": "ABBV",
+      "name": "AbbVie",
+      "category": "equity",
+      "assetClass": "equity",
+      "exchange": "NYSE",
+      "currency": "USD",
+      "country": "US",
+      "sector": "healthcare",
+      "enabled": false,
+      "groups": [
+        "equity_health:+1",
+        "indices_us:+1"
+      ],
+      "note": "[DÉSACTIVÉ le 22/08/2026 — budget crédits] Twelve Data gratuit plafonne à 800 crédits REST/jour ; 1 actif scanné en H1 = 24 crédits/jour, donc 33 actifs max. Réactivable directement (repasser enabled à true) si passage à un plan payant ou si SPC_MAX_SYMBOLS est relevé."
+    },
+    {
+      "std": "WMT",
+      "provider": "WMT",
+      "name": "Walmart",
+      "category": "equity",
+      "assetClass": "equity",
+      "exchange": "NYSE",
+      "currency": "USD",
+      "country": "US",
+      "sector": "consumer",
+      "enabled": true,
+      "groups": [
+        "equity_consumer:+1",
+        "indices_us:+1"
+      ]
+    },
+    {
+      "std": "PG",
+      "provider": "PG",
+      "name": "Procter & Gamble",
+      "category": "equity",
+      "assetClass": "equity",
+      "exchange": "NYSE",
+      "currency": "USD",
+      "country": "US",
+      "sector": "consumer",
+      "enabled": true,
+      "groups": [
+        "equity_consumer:+1",
+        "indices_us:+1"
+      ]
+    },
+    {
+      "std": "KO",
+      "provider": "KO",
+      "name": "Coca-Cola",
+      "category": "equity",
+      "assetClass": "equity",
+      "exchange": "NYSE",
+      "currency": "USD",
+      "country": "US",
+      "sector": "consumer",
+      "enabled": true,
+      "groups": [
+        "equity_consumer:+1",
+        "indices_us:+1"
+      ]
+    },
+    {
+      "std": "HD",
+      "provider": "HD",
+      "name": "Home Depot",
+      "category": "equity",
+      "assetClass": "equity",
+      "exchange": "NYSE",
+      "currency": "USD",
+      "country": "US",
+      "sector": "consumer",
+      "enabled": true,
+      "groups": [
+        "equity_consumer:+1",
+        "indices_us:+1"
+      ]
+    },
+    {
+      "std": "COST",
+      "provider": "COST",
+      "name": "Costco",
+      "category": "equity",
+      "assetClass": "equity",
+      "exchange": "NASDAQ",
+      "currency": "USD",
+      "country": "US",
+      "sector": "consumer",
+      "enabled": false,
+      "groups": [
+        "equity_consumer:+1",
+        "indices_us:+1"
+      ],
+      "note": "[DÉSACTIVÉ le 22/08/2026 — budget crédits] Twelve Data gratuit plafonne à 800 crédits REST/jour ; 1 actif scanné en H1 = 24 crédits/jour, donc 33 actifs max. Réactivable directement (repasser enabled à true) si passage à un plan payant ou si SPC_MAX_SYMBOLS est relevé."
+    },
+    {
+      "std": "XOM",
+      "provider": "XOM",
+      "name": "ExxonMobil",
+      "category": "equity",
+      "assetClass": "equity",
+      "exchange": "NYSE",
+      "currency": "USD",
+      "country": "US",
+      "sector": "energy",
+      "enabled": true,
+      "groups": [
+        "equity_energy:+1",
+        "energy:+1",
+        "indices_us:+1"
+      ]
+    },
+    {
+      "std": "CVX",
+      "provider": "CVX",
+      "name": "Chevron",
+      "category": "equity",
+      "assetClass": "equity",
+      "exchange": "NYSE",
+      "currency": "USD",
+      "country": "US",
+      "sector": "energy",
+      "enabled": false,
+      "groups": [
+        "equity_energy:+1",
+        "energy:+1",
+        "indices_us:+1"
+      ],
+      "note": "[DÉSACTIVÉ le 22/08/2026 — budget crédits] Twelve Data gratuit plafonne à 800 crédits REST/jour ; 1 actif scanné en H1 = 24 crédits/jour, donc 33 actifs max. Réactivable directement (repasser enabled à true) si passage à un plan payant ou si SPC_MAX_SYMBOLS est relevé."
+    },
+    {
+      "std": "CAT",
+      "provider": "CAT",
+      "name": "Caterpillar",
+      "category": "equity",
+      "assetClass": "equity",
+      "exchange": "NYSE",
+      "currency": "USD",
+      "country": "US",
+      "sector": "industrials",
+      "enabled": true,
+      "groups": [
+        "equity_industrials:+1",
+        "indices_us:+1"
+      ]
+    },
+    {
+      "std": "BA",
+      "provider": "BA",
+      "name": "Boeing",
+      "category": "equity",
+      "assetClass": "equity",
+      "exchange": "NYSE",
+      "currency": "USD",
+      "country": "US",
+      "sector": "industrials",
+      "enabled": true,
+      "groups": [
+        "equity_industrials:+1",
+        "indices_us:+1"
+      ]
+    },
+    {
+      "std": "TSLA",
+      "provider": "TSLA",
+      "name": "Tesla",
+      "category": "equity",
+      "assetClass": "equity",
+      "exchange": "NASDAQ",
+      "currency": "USD",
+      "country": "US",
+      "sector": "consumer",
+      "enabled": true,
+      "groups": [
+        "equity_consumer:+1",
+        "indices_us:+1"
+      ]
+    },
+    {
+      "std": "NFLX",
+      "provider": "NFLX",
+      "name": "Netflix",
+      "category": "equity",
+      "assetClass": "equity",
+      "exchange": "NASDAQ",
+      "currency": "USD",
+      "country": "US",
+      "sector": "tech",
+      "enabled": false,
+      "groups": [
+        "equity_tech:+1",
+        "indices_us:+1"
+      ],
+      "note": "[DÉSACTIVÉ le 22/08/2026 — budget crédits] Twelve Data gratuit plafonne à 800 crédits REST/jour ; 1 actif scanné en H1 = 24 crédits/jour, donc 33 actifs max. Réactivable directement (repasser enabled à true) si passage à un plan payant ou si SPC_MAX_SYMBOLS est relevé."
+    },
+    {
+      "std": "ASML",
+      "provider": "ASML",
+      "name": "ASML (ADR US)",
+      "category": "equity",
+      "assetClass": "equity",
+      "exchange": "NASDAQ",
+      "currency": "USD",
+      "country": "NL",
+      "sector": "tech",
+      "enabled": false,
+      "note": "[DÉSACTIVÉ le 22/08/2026 — budget crédits] Twelve Data gratuit plafonne à 800 crédits REST/jour ; 1 actif scanné en H1 = 24 crédits/jour, donc 33 actifs max. Réactivable directement (repasser enabled à true) si passage à un plan payant ou si SPC_MAX_SYMBOLS est relevé.",
+      "groups": [
+        "equity_tech:+1",
+        "equity_eu:+1"
+      ]
+    },
+    {
+      "std": "SAP",
+      "provider": "SAP",
+      "name": "SAP (ADR US)",
+      "category": "equity",
+      "assetClass": "equity",
+      "exchange": "NYSE",
+      "currency": "USD",
+      "country": "DE",
+      "sector": "tech",
+      "enabled": false,
+      "note": "[DÉSACTIVÉ le 22/08/2026 — budget crédits] Twelve Data gratuit plafonne à 800 crédits REST/jour ; 1 actif scanné en H1 = 24 crédits/jour, donc 33 actifs max. Réactivable directement (repasser enabled à true) si passage à un plan payant ou si SPC_MAX_SYMBOLS est relevé.",
+      "groups": [
+        "equity_tech:+1",
+        "equity_eu:+1"
+      ]
+    },
+    {
+      "std": "MC",
+      "provider": "MC",
+      "name": "LVMH",
+      "category": "equity",
+      "assetClass": "equity",
+      "exchange": "Euronext",
+      "currency": "EUR",
+      "country": "FR",
+      "sector": "consumer",
+      "enabled": false,
+      "note": "[À VÉRIFIER CHEZ LE COURTIER] Le ticker nu 'MC' est ambigu (collision avec Moelis & Company au NYSE) — nécessite probablement un format avec bourse (ex: MC:PA) et un plan payant Euronext.",
+      "groups": [
+        "equity_consumer:+1",
+        "equity_eu:+1"
+      ]
+    },
+    {
+      "std": "NESN",
+      "provider": "NESN",
+      "name": "Nestlé",
+      "category": "equity",
+      "assetClass": "equity",
+      "exchange": "SIX",
+      "currency": "CHF",
+      "country": "CH",
+      "sector": "consumer",
+      "enabled": false,
+      "note": "[À VÉRIFIER CHEZ LE COURTIER] Ticker nu probablement insuffisant sur SIX — format avec bourse (ex: NESN:SW) et plan payant probable.",
+      "groups": [
+        "equity_consumer:+1",
+        "equity_eu:+1"
+      ]
+    },
+    {
+      "std": "AZN",
+      "provider": "AZN",
+      "name": "AstraZeneca (ADR US)",
+      "category": "equity",
+      "assetClass": "equity",
+      "exchange": "NASDAQ",
+      "currency": "USD",
+      "country": "GB",
+      "sector": "healthcare",
+      "enabled": false,
+      "note": "[DÉSACTIVÉ le 22/08/2026 — budget crédits] Twelve Data gratuit plafonne à 800 crédits REST/jour ; 1 actif scanné en H1 = 24 crédits/jour, donc 33 actifs max. Réactivable directement (repasser enabled à true) si passage à un plan payant ou si SPC_MAX_SYMBOLS est relevé.",
+      "groups": [
+        "equity_health:+1",
+        "equity_eu:+1"
+      ]
+    },
+    {
+      "std": "7203",
+      "provider": "7203",
+      "name": "Toyota",
+      "category": "equity",
+      "assetClass": "equity",
+      "exchange": "TSE",
+      "currency": "JPY",
+      "country": "JP",
+      "sector": "consumer",
+      "enabled": false,
+      "note": "[À VÉRIFIER CHEZ LE COURTIER] Code numérique seul insuffisant pour Tokyo — format probable 7203:TSE ou 7203.T, plan payant probable.",
+      "groups": [
+        "equity_asia:+1",
+        "equity_consumer:+1"
+      ]
+    },
+    {
+      "std": "6758",
+      "provider": "6758",
+      "name": "Sony",
+      "category": "equity",
+      "assetClass": "equity",
+      "exchange": "TSE",
+      "currency": "JPY",
+      "country": "JP",
+      "sector": "tech",
+      "enabled": false,
+      "note": "[À VÉRIFIER CHEZ LE COURTIER] Code numérique seul insuffisant pour Tokyo — format probable 6758:TSE ou 6758.T, plan payant probable.",
+      "groups": [
+        "equity_asia:+1",
+        "equity_tech:+1"
+      ]
+    },
+    {
+      "std": "005930",
+      "provider": "005930",
+      "name": "Samsung Electronics",
+      "category": "equity",
+      "assetClass": "equity",
+      "exchange": "KRX",
+      "currency": "KRW",
+      "country": "KR",
+      "sector": "tech",
+      "enabled": false,
+      "note": "[À VÉRIFIER CHEZ LE COURTIER] Code numérique seul insuffisant pour Séoul — format probable 005930:KRX, plan payant probable.",
+      "groups": [
+        "equity_asia:+1",
+        "equity_tech:+1"
+      ]
+    }
+  ]
+}

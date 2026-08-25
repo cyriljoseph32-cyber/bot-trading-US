@@ -13,7 +13,10 @@
     "preview": "vite preview",
     "bot:paper": "tsx bot/src/index.ts",
     "bot:dev": "tsx watch bot/src/index.ts",
-    "bot:backtest": "tsx bot/src/backtest.ts"
+    "bot:backtest": "tsx bot/src/backtest.ts",
+    "bot:spcfx5": "tsx bot/src/spcfx5.ts",
+    "bot:spcfx5-backtest": "tsx bot/src/spcfx5-backtest.ts",
+    "bot:spcfx5-check": "tsx bot/src/spcfx5-check.ts"
   },
   "dependencies": {
     "react": "^19.2.7",

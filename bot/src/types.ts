@@ -6,12 +6,18 @@
 
 export type AssetClass = "equity" | "fx" | "crypto";
 
-export type Timeframe = "1m" | "5m" | "15m";
+export type Timeframe = "1m" | "5m" | "15m" | "1h" | "4h" | "1d";
+/** Timeframes agrégés par défaut (bot temps réel 15m — comportement historique). */
 export const TIMEFRAMES: Timeframe[] = ["1m", "5m", "15m"];
+/** Timeframes de la stratégie SPC FX5 (signal H1, confirmations H4/D1). */
+export const SPC_TIMEFRAMES: Timeframe[] = ["1h", "4h", "1d"];
 export const TF_MS: Record<Timeframe, number> = {
   "1m": 60_000,
   "5m": 300_000,
   "15m": 900_000,
+  "1h": 3_600_000,
+  "4h": 14_400_000,
+  "1d": 86_400_000,
 };
 
 export interface Instrument {
@@ -46,6 +52,12 @@ export interface Quote {
   ts: number;
   /** true si la donnée est trop vieille pour être exploitable. */
   stale: boolean;
+  /**
+   * true si le bid/ask est RECONSTITUÉ (dérivé d'un coût configuré) et non
+   * observé sur le marché — cas des cotations dérivées de bougies H1. La
+   * stratégie doit alors traiter le spread comme inconnu, pas comme mesuré.
+   */
+  estimated?: boolean;
 }
 
 /** Bougie OHLCV normalisée. */

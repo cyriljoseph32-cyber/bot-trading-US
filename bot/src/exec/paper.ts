@@ -162,6 +162,30 @@ export class PaperBroker implements BrokerAdapter {
     return res;
   }
 
+  /** Position ouverte sur ce symbole, ou null. */
+  position(symbol: string): Position | null {
+    return this.positions.get(symbol) ?? null;
+  }
+
+  /**
+   * Déplace le stop d'une position ouverte (break-even, trailing).
+   *
+   * Le stop ne peut QUE se resserrer : jamais s'éloigner du prix. Un stop qui
+   * recule augmenterait le risque d'une position déjà engagée — exactement ce
+   * qu'un trailing stop est censé empêcher.
+   */
+  updateStop(symbol: string, newStop: number): boolean {
+    const pos = this.positions.get(symbol);
+    if (!pos || !(newStop > 0)) return false;
+    const isLong = pos.qty > 0;
+    if (pos.stopLoss !== undefined) {
+      if (isLong && newStop <= pos.stopLoss) return false;
+      if (!isLong && newStop >= pos.stopLoss) return false;
+    }
+    pos.stopLoss = newStop;
+    return true;
+  }
+
   /** Vérifie stops/take-profits sur une cotation ; renvoie l'ordre de sortie éventuel. */
   checkExit(quote: Quote): OrderRequest | null {
     const pos = this.positions.get(quote.symbol);
