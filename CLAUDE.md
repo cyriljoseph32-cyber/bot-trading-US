@@ -36,6 +36,23 @@ TypeScript, déployé sur Vercel. Deux moteurs :
 - `api/market.ts` = proxy Yahoo Finance en production ; en dev local, le proxy Vite
   (`vite.config.ts`) fait le même travail.
 
+## Cartographie du code (graphify)
+
+`graphify-out/` contient une cartographie locale et déterministe du code (AST via
+tree-sitter, `graphify extract . --code-only` — pas de LLM, rien n'a quitté la machine).
+Avant de grepper le code pour une question d'architecture, préférer :
+
+```bash
+graphify query "<question>"        # sous-graphe ciblé pour une question en langage naturel
+graphify explain "<Symbole>"       # voisins + arêtes taguées EXTRACTED/INFERRED d'un nœud
+graphify path "<A>" "<B>"          # plus court chemin entre deux concepts
+graphify god-nodes                 # fichiers/symboles les plus connectés (hubs)
+```
+
+`graphify-out/graph.html` s'ouvre directement dans un navigateur. À régénérer après un
+refactor significatif : `graphify extract . --code-only && graphify cluster-only .
+--no-label` (depuis la racine du dépôt ; nécessite `uv tool install graphifyy`).
+
 ## L'équipe d'agents
 
 | Agent | Rôle | Raccourci |
